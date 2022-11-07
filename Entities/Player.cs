@@ -70,7 +70,7 @@ namespace SpeezleGame.Entities.Players
             get
             {
                 //return new Rectangle((int)Position.X - 8, (int)Position.Y - 16, 16, 33);
-                return new Rectangle((int)Position.X + 8 , (int)Position.Y - 4 , 16, 33);
+                return new Rectangle((int)Position.X + 8 , (int)Position.Y  , 16, 33);
             }
         }
 
@@ -250,6 +250,10 @@ namespace SpeezleGame.Entities.Players
                                 Position = new Vector2(Position.X, Position.Y + depth.Y);
 
                                 bounds = playerBounds;
+                            }
+                            else
+                            {
+                                Position = new Vector2(Position.X, Position.Y + depth.Y);
                             }
 
                         }
