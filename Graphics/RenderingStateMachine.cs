@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
@@ -62,6 +63,7 @@ namespace SpeezleGame.Graphics
 
         public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
         {
+           
             CurrentState?.Animation?.Draw(spriteBatch, position, spriteEffects);
         }
 

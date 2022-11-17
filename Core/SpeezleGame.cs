@@ -25,7 +25,8 @@ namespace SpeezleGame.Core
         private Dictionary<int, TiledTileset> tilesets; //
         private Texture2D tilesetTexture; //
         private TiledLayer collisionLayer; //
-        private List<Rectangle> collisionObjects;
+        private List<Rectangle> RectangleCollisionObjects;
+        private List<TiledPolygon> PolygonCollisionObjects;
 
 
         private Matrix transformMatrix; //
@@ -39,16 +40,16 @@ namespace SpeezleGame.Core
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            
 
             _graphics.PreferredBackBufferWidth = 1920;
             _graphics.PreferredBackBufferHeight = 640;
-            _graphics.ApplyChanges();
+            _graphics.ApplyChanges(); //set temporary window size
 
             var WindowSize = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             var MapSize = new Vector2(960, 320);
 
-            transformMatrix = Matrix.CreateScale(new Vector3(WindowSize / MapSize, 1));
+            transformMatrix = Matrix.CreateScale(new Vector3(WindowSize / MapSize, 1)); //a matrix that allows me to scale everything drawn on the screen
 
             base.Initialize();
         }
@@ -68,22 +69,25 @@ namespace SpeezleGame.Core
 
 
             _player = new Player(container);
+            
 
+            //load textures
             map = new TiledMap(Content.RootDirectory + "\\Test/tilemaptest.tmx");
             tilesets = map.GetTiledTilesets("Content/Test/");
             tilesetTexture = Content.Load<Texture2D>("Test/SpeezleTileSetPng");
             collisionLayer = map.Layers.First(l => l.name == "Collidable");
             _tileMapHandler = new TileMapHandler(_spriteBatch, map, tilesets, tilesetTexture);
 
-            collisionObjects = new List<Rectangle>();
-            foreach (var obj in collisionLayer.objects)
+            RectangleCollisionObjects = new List<Rectangle>();
+            PolygonCollisionObjects = new List<TiledPolygon>();
+            foreach (var obj in collisionLayer.objects) //get all the collidable objects on the map
             {
-                collisionObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
+                RectangleCollisionObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
             }
 
 
 
-            // TODO: use this.Content to load your game content here
+            
         }
 
         protected override void Update(GameTime gameTime)
@@ -91,15 +95,15 @@ namespace SpeezleGame.Core
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-            HandleInput(gameTime);
+            
+            HandleInput(gameTime); //get keyboard state
 
-            _player.Update(gameTime, keyboardState, collisionObjects);
+            _player.Update(gameTime, keyboardState, RectangleCollisionObjects, PolygonCollisionObjects); //update player every frame //note to myseld: fix polygon collision objects
             base.Update(gameTime);
 
-            var initPos = _player.Position; //temp collision
+            var initPos = _player.Position; //note to myself: temp collision
 
-            /*_player.CheckPlatformCollision(collisionObjects, gameTime);*/
+            
 
 
 
@@ -114,7 +118,6 @@ namespace SpeezleGame.Core
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
 

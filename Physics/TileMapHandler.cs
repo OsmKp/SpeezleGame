@@ -83,7 +83,7 @@ namespace SpeezleGame.Physics
                         var destination = new Rectangle(tileX, tileY, map.TileWidth, map.TileHeight);
 
 
-                        // You can use the helper methods to get information to handle flips and rotations
+                        
                         Trans tileTrans = Trans.None;
                         if (map.IsTileFlippedHorizontal(layer, x, y)) tileTrans |= Trans.Flip_H;
                         if (map.IsTileFlippedVertical(layer, x, y)) tileTrans |= Trans.Flip_V;

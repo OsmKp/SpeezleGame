@@ -37,7 +37,7 @@ namespace SpeezleGame.Graphics
             Texture = texture;
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime) 
         {
             if (State == AnimationState.Playing)
             {
