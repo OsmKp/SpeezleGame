@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpeezleGame.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -61,10 +62,10 @@ namespace SpeezleGame.Graphics
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, SpriteHandler spriteHandler)
         {
            
-            CurrentState?.Animation?.Draw(spriteBatch, position, spriteEffects);
+            CurrentState?.Animation?.Draw(spriteBatch, position, spriteEffects,spriteHandler);
         }
 
         public void Update(GameTime gameTime)

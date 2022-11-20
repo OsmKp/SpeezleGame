@@ -9,27 +9,23 @@ using SpeezleGame.Entities.Players;
 using SpeezleGame.Graphics;
 using static System.Net.Mime.MediaTypeNames;
 using SpeezleGame.Physics;
+using SpeezleGame.UI;
+using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
+using SpeezleGame.States;
 
 namespace SpeezleGame.Core
 {
     public class SpeezleGame : Game
     {
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
-        private Player _player;
-        private TileMapHandler _tileMapHandler;
-        private KeyboardState keyboardState;
-
-        private TiledMap map; //
-        private Dictionary<int, TiledTileset> tilesets; //
-        private Texture2D tilesetTexture; //
-        private TiledLayer collisionLayer; //
-        private List<Rectangle> RectangleCollisionObjects;
-        private List<TiledPolygon> PolygonCollisionObjects;
+        private Color _backgroundColour = Color.CornflowerBlue;
 
 
-        private Matrix transformMatrix; //
+        //private Player _player;
+
+
 
         public SpeezleGame()
         {
@@ -40,16 +36,15 @@ namespace SpeezleGame.Core
 
         protected override void Initialize()
         {
-            
 
-            _graphics.PreferredBackBufferWidth = 1920;
-            _graphics.PreferredBackBufferHeight = 640;
+
+
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferWidth = ScreenManager.ScreenWidth;
+            _graphics.PreferredBackBufferHeight = ScreenManager.ScreenHeight;
             _graphics.ApplyChanges(); //set temporary window size
 
-            var WindowSize = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-            var MapSize = new Vector2(960, 320);
-
-            transformMatrix = Matrix.CreateScale(new Vector3(WindowSize / MapSize, 1)); //a matrix that allows me to scale everything drawn on the screen
+            GameStateManager.Instance.Initialize(this);
 
             base.Initialize();
         }
@@ -58,74 +53,48 @@ namespace SpeezleGame.Core
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Texture2D idleTexture = Content.Load<Texture2D>("Textures/main-char_idle_unarmed");
-            Texture2D walkTexture = Content.Load<Texture2D>("Textures/main-char_walk_unarmed");
+            GameStateManager.Instance.SetContent(Content);
+            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice));
 
-            PlayerTextureContainer container = new PlayerTextureContainer
-            {
-                Idle = idleTexture,
-                Walk = walkTexture
-            };
-
-
-            _player = new Player(container);
-            
-
-            //load textures
-            map = new TiledMap(Content.RootDirectory + "\\Test/tilemaptest.tmx");
-            tilesets = map.GetTiledTilesets("Content/Test/");
-            tilesetTexture = Content.Load<Texture2D>("Test/SpeezleTileSetPng");
-            collisionLayer = map.Layers.First(l => l.name == "Collidable");
-            _tileMapHandler = new TileMapHandler(_spriteBatch, map, tilesets, tilesetTexture);
-
-            RectangleCollisionObjects = new List<Rectangle>();
-            PolygonCollisionObjects = new List<TiledPolygon>();
-            foreach (var obj in collisionLayer.objects) //get all the collidable objects on the map
-            {
-                RectangleCollisionObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
-            }
-
-
-
+            //ScreenManager.Instance.LoadContent(Content, GraphicsDevice);
             
         }
+
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            
-            HandleInput(gameTime); //get keyboard state
+            GameStateManager.Instance.Update(gameTime);
 
-            _player.Update(gameTime, keyboardState, RectangleCollisionObjects, PolygonCollisionObjects); //update player every frame //note to myseld: fix polygon collision objects
+            //ScreenManager.Instance.Update(gameTime);
+
             base.Update(gameTime);
-
-            var initPos = _player.Position; //note to myself: temp collision
-
-            
-
-
-
         }
 
-        private void HandleInput(GameTime gameTime)
+        protected override void UnloadContent()
         {
-            keyboardState = Keyboard.GetState();
+            GameStateManager.Instance.UnloadContent();
+            //ScreenManager.Instance.UnloadContent();
         }
-
         protected override void Draw(GameTime gameTime)
         {
+
+
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            GameStateManager.Instance.Draw(_spriteBatch, gameTime);
 
+            //ScreenManager.Instance.Draw(_spriteBatch, gameTime);
             base.Draw(gameTime);
 
-            _tileMapHandler.Draw(transformMatrix);
+           
+            
 
             
-            _player.Draw(_spriteBatch, gameTime, transformMatrix);
-            
         }
+
+
     }
 }

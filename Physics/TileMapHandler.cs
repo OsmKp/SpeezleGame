@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpeezleGame.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ namespace SpeezleGame.Physics
 {
     public class TileMapHandler
     {
+        private GraphicsDevice _graphicsDevice;
         private SpriteBatch spriteBatch;
         TiledMap map;
         Dictionary<int, TiledTileset> tilesets;
@@ -36,18 +38,20 @@ namespace SpeezleGame.Physics
         }
 
 
-        public TileMapHandler(SpriteBatch _spriteBatch, TiledMap _map, Dictionary<int, TiledTileset> _tilesets, Texture2D _tileSetTexture)
+        public TileMapHandler(GraphicsDevice graphics, TiledMap _map, Dictionary<int, TiledTileset> _tilesets, Texture2D _tileSetTexture)
         {
-            spriteBatch = _spriteBatch;
+            _graphicsDevice = graphics;
+            spriteBatch = new SpriteBatch(graphics);
             map = _map;
             tilesets = _tilesets;
             tilesetTexture = _tileSetTexture;
 
         }
 
-        public void Draw(Matrix transformMatrix)
+        public void Draw(Matrix transformMatrix, SpriteHandler spriteHandler)
         {
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
+           
+            
 
             var tileLayers = map.Layers.Where(x => x.type == TiledLayerType.TileLayer);
 
@@ -124,11 +128,12 @@ namespace SpeezleGame.Physics
 
 
                         // Render sprite at position tileX, tileY using the rect
-                        spriteBatch.Draw(tilesetTexture, destination, source, Color.White, (float)rotation, Vector2.Zero, effects, 0);
+                        spriteHandler.Draw(tilesetTexture, source, destination, (float)rotation, effects, Color.White);
+                        //spriteBatch.Draw(tilesetTexture, destination, source, Color.White, (float)rotation, Vector2.Zero, effects, 0);
                     }
                 }
             }
-            spriteBatch.End();
+            
         }
 
 

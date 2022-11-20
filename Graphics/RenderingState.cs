@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpeezleGame.Core;
 
 namespace SpeezleGame.Graphics
 {
@@ -14,9 +15,9 @@ namespace SpeezleGame.Graphics
             Animation = animation;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, SpriteHandler spriteHandler)
         {
-            Animation?.Draw(spriteBatch, position, spriteEffects);
+            Animation?.Draw(spriteBatch, position, spriteEffects, spriteHandler);
         }
     }
 }

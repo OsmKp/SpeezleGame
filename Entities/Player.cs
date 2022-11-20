@@ -12,6 +12,8 @@ using TiledCS;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using System.Diagnostics;
 using SpeezleGame.Physics;
+using Microsoft.Xna.Framework.Content;
+using SpeezleGame.Core;
 
 namespace SpeezleGame.Entities.Players
 {
@@ -22,6 +24,9 @@ namespace SpeezleGame.Entities.Players
         private const int WALK_ANIM_SPRITE_COUNT = 4;
         private const int WALK_ANIM_SPRITE_SIZE = 32;
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
+
+        private Camera camera;
+
         private readonly Vector2 gravity = new Vector2(0, 10f);
 
         public bool IsAlive { get { return isAlive; } }
@@ -76,7 +81,7 @@ namespace SpeezleGame.Entities.Players
         private bool isDashLocked ;
         private bool wasDashing ;
         private float dashTime;
-        private const float dashCD = 3f;
+        private const float dashCD = 1.0f;
         private float dashCDTimer;
 
         //variables  for jumping
@@ -104,23 +109,26 @@ namespace SpeezleGame.Entities.Players
 
 
 
-        public Player(PlayerTextureContainer textureContainer) 
+        public Player(PlayerTextureContainer container) 
         {
+
+            camera = new Camera(this);
+
             Position = new Vector2(100, 200); // TEMP
             
 
 
             //add animations to the player animation container
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Idle),
-                new SpriteAnimation(textureContainer.Idle, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Idle, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Walk),
-                new SpriteAnimation(textureContainer.Walk, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Walk, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
 
             _renderingStateMachine.SetState(nameof(PlayerTextureContainer.Idle)); //set the initial state to idle
             _renderingStateMachine.CurrentState.Animation.Play();
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime, Matrix transformMatrix)
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime, Matrix transformMatrix, SpriteHandler spriteHandler)
         {
             SpriteEffects flip = SpriteEffects.None;
             
@@ -135,14 +143,18 @@ namespace SpeezleGame.Entities.Players
                 flip = SpriteEffects.FlipHorizontally;
 
             //draw player
-            spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
-            _renderingStateMachine.Draw(spriteBatch, Position, flip);
-            spriteBatch.End();
+            
+
+            //spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
+            _renderingStateMachine.Draw(spriteBatch, Position, flip, spriteHandler);
+            //spriteBatch.End();
         }
 
-        public void Update(GameTime gameTime, KeyboardState keyboardState, List<Rectangle> RectangleCollisionObjects, List<TiledPolygon> PolygonCollisionObjects)
+        public void Update(GameTime gameTime, KeyboardState keyboardState, MouseState mouseState, /*MouseState previousMouseState,*/ List<Rectangle> RectangleCollisionObjects, List<TiledPolygon> PolygonCollisionObjects)
         {
-            GetInput(keyboardState); //first get what keys are pressed each frame
+
+
+            GetInput(keyboardState, mouseState/*, previousMouseState*/ ); //first get what keys are pressed each frame
 
             ApplyPhysics(gameTime, RectangleCollisionObjects, PolygonCollisionObjects); //apply physics and process key presses
 
@@ -164,9 +176,9 @@ namespace SpeezleGame.Entities.Players
 
             _renderingStateMachine.Update(gameTime);
 
-            
 
-            
+
+            //camera.Follow();
             
 
             movement = 0.0f;
@@ -175,7 +187,7 @@ namespace SpeezleGame.Entities.Players
         }
 
         //get key inputs
-        private void GetInput(KeyboardState keyboardState)
+        private void GetInput(KeyboardState keyboardState, MouseState mouseState/* MouseState previousMouseState*/)
         {
             if (keyboardState.IsKeyDown(Keys.A))
             {
@@ -195,7 +207,7 @@ namespace SpeezleGame.Entities.Players
 
             if (!isDashLocked)
             {
-                isDashingPressed = keyboardState.IsKeyDown(Keys.LeftShift);
+                isDashingPressed = keyboardState.IsKeyDown(Keys.LeftShift) || (mouseState.LeftButton == ButtonState.Pressed/* && previousMouseState.LeftButton == ButtonState.Pressed*/);
                 if (isDashingPressed)
                 {
                     dashCDTimer = 0;

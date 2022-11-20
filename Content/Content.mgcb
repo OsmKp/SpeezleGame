@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:Test/cavesofgallet_tiles.png
 
+#begin Test/FontTest.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Test/FontTest.spritefont
+
 #begin Test/SpeezleTileSetPng.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -36,6 +43,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Test/SpeezleTileSetPng.png
+
+#begin Test/TestButton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Test/TestButton.png
 
 #begin Textures/AnimationTestBigCharacter.png
 /importer:TextureImporter

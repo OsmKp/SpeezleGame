@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SpeezleGame.Core;
 
 namespace SpeezleGame.Graphics
 {
@@ -50,10 +51,11 @@ namespace SpeezleGame.Graphics
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, SpriteHandler spriteHandler)
         {
             var drawRect = new Rectangle(CurrentOffset * SpriteWidth, 0, SpriteWidth, SpriteHeight);
-            spriteBatch.Draw(Texture, position, drawRect, Color.White, 0f, Vector2.Zero, Vector2.One, spriteEffects, 0f);
+            //spriteBatch.Draw(Texture, position, drawRect, Color.White, 0f, Vector2.Zero, Vector2.One, spriteEffects, 0f);
+            spriteHandler.Draw(Texture, drawRect, Vector2.Zero, position, 0f, Vector2.One, Color.White, spriteEffects);
 
         }
 
