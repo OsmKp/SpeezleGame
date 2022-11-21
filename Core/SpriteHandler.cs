@@ -26,7 +26,7 @@ namespace SpeezleGame.Core
 
         }
 
-        public void Begin(bool isTextureFilteringAvailable)
+        public void Begin(bool isTextureFilteringAvailable, Matrix transformMatrix)
         {
             SamplerState sampler = SamplerState.PointClamp;
             if (isTextureFilteringAvailable)
@@ -34,6 +34,16 @@ namespace SpeezleGame.Core
                 sampler = SamplerState.LinearClamp;
             }
 
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: sampler, rasterizerState: RasterizerState.CullNone, transformMatrix: transformMatrix);
+        }
+
+        public void Begin(bool isTextureFilteringAvailable)
+        {
+            SamplerState sampler = SamplerState.PointClamp;
+            if (isTextureFilteringAvailable)
+            {
+                sampler = SamplerState.LinearClamp;
+            }
             spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: sampler, rasterizerState: RasterizerState.CullNone);
         }
 

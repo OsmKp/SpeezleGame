@@ -1,20 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SpeezleGame.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpeezleGame.UI
+namespace SpeezleGame.Entities
 {
-    public abstract class Component
+    public abstract class BaseEntity
     {
-        public virtual void Draw(SpriteBatch spriteBatch) { }
-
-
+        public abstract void Draw(SpriteBatch spriteBatch,GameTime gameTime);
         public abstract void Update(GameTime gameTime);
-
     }
 }

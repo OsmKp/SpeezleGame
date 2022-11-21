@@ -48,7 +48,7 @@ namespace SpeezleGame.Physics
 
         }
 
-        public void Draw(Matrix transformMatrix, SpriteHandler spriteHandler)
+        public void Draw(SpriteBatch spriteBatch/*,Matrix transformMatrix*/)
         {
            
             
@@ -128,8 +128,8 @@ namespace SpeezleGame.Physics
 
 
                         // Render sprite at position tileX, tileY using the rect
-                        spriteHandler.Draw(tilesetTexture, source, destination, (float)rotation, effects, Color.White);
-                        //spriteBatch.Draw(tilesetTexture, destination, source, Color.White, (float)rotation, Vector2.Zero, effects, 0);
+                        //spriteHandler.Draw(tilesetTexture, source, destination, (float)rotation, effects, Color.White);
+                        spriteBatch.Draw(tilesetTexture, destination, source, Color.White, (float)rotation, Vector2.Zero, effects, 0);
                     }
                 }
             }

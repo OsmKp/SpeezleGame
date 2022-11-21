@@ -15,13 +15,20 @@ namespace SpeezleGame.Core
 
     public class GameStateManager
     {
+        GUIRenderer guiRenderer;
+        EntityRenderer entityRenderer;
+        BackgroundRenderer backgroundRenderer;
+
+
         private ContentManager Content;
         private static GameStateManager _instance;
         private Stack<GameState> _screens = new Stack<GameState>();
         private ScreenManager screenManager;
         private SpriteHandler spriteHandler;
-        private Game game;
-
+        private SpeezleGame game;
+        private int renderingTargetDimW = 640;
+        private int renderingTargetDimH = 360;
+        public static Matrix TransformMatrix = Matrix.Identity;
         
         public static Matrix transformMatrix; //maybe make a new class for resolution handling
 
@@ -43,12 +50,15 @@ namespace SpeezleGame.Core
             
         }
 
-        public void Initialize(Game game)
+        public void Initialize(SpeezleGame game, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer)
         {
             this.game = game;
-            
+            this.guiRenderer = guiRenderer;
+            this.entityRenderer = entityRenderer;
+            this.backgroundRenderer = backgroundRenderer;
+
             var MapSize = new Vector2(960, 320);
-            screenManager = new ScreenManager(this.game, 640, 360);
+            screenManager = new ScreenManager(this.game, renderingTargetDimW, renderingTargetDimH);
             spriteHandler = new SpriteHandler(this.game);
 
             //transformMatrix = Matrix.CreateScale(new Vector3(Dimensions / MapSize, 1)); //a matrix that allows me to scale everything drawn on the screen
@@ -64,6 +74,11 @@ namespace SpeezleGame.Core
             {
                 state.UnloadContent(Content);
             }
+        }
+
+        public static void UpdateCamera(Matrix transform)
+        {
+            TransformMatrix = transform;
         }
         public void AddScreen(GameState screen)
         {
@@ -145,13 +160,36 @@ namespace SpeezleGame.Core
             {
                 if (_screens.Count > 0)
                 {
+                    /*
+                    EntityRenderer.Begin();
+
+                    EntityRenderer.End();
+                    */
                     screenManager.Set();
+
+                    backgroundRenderer.Begin(TransformMatrix, false);
+                    _screens.Peek().DrawBackground(gameTime);
+                    backgroundRenderer.End();
+
+                    entityRenderer.Begin(TransformMatrix, false);
+                    _screens.Peek().DrawEntity(gameTime);
+                    entityRenderer.End();
+
+                    guiRenderer.Begin(TransformMatrix, false);
+                    _screens.Peek().DrawGUI(gameTime);
+                    guiRenderer.End();
+
+                    screenManager.UnSet();
+
+                    screenManager.Display(TransformMatrix);
+
+                   /* screenManager.Set();
                     spriteHandler.Begin(false);
-                    _screens.Peek().Draw(spriteBatch, gameTime);
+                    _screens.Peek().Draw(gameTime);
                     spriteHandler.End();
                     screenManager.UnSet();
 
-                    screenManager.Display(spriteHandler);
+                    screenManager.Display(spriteHandler, TransformMatrix);*/
                 }
             }
             catch (Exception ex)

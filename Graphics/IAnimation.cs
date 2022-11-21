@@ -6,7 +6,7 @@ namespace SpeezleGame.Graphics
 {
     public interface IAnimation
     {
-        void Draw(SpriteBatch spriteBatch, Vector2 vector2, SpriteEffects spriteEffects, SpriteHandler spriteHandler);
+        void Draw(SpriteBatch spriteBatch, Vector2 vector2, SpriteEffects spriteEffects);
 
         void Update(GameTime gameTime);
 

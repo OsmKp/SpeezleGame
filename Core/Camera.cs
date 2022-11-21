@@ -18,20 +18,21 @@ namespace SpeezleGame.Core
             playerToFollow = targetPlayer;
         }
 
-        /*public void Follow()
+        public void Follow()
         {
             var playerRectangle = playerToFollow.playerBounds;
             var playerPos = Matrix.CreateTranslation(
                 -playerRectangle.X - (playerRectangle.Width / 2),
-                playerRectangle.Y - (playerRectangle.Height / 2),
+                -playerRectangle.Y - (playerRectangle.Height / 2),
                 0);
+
             var offset = Matrix.CreateTranslation(
-                GameStateManager.Instance.Dimensions.X / 2,
-                GameStateManager.Instance.Dimensions.Y / 2,
+                640 / 2,
+                360 / 2,
                 0);
 
             TransformMatrix = playerPos * offset;
-        }*/
+        }
 
     }
 }

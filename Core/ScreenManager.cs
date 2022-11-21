@@ -13,8 +13,8 @@ namespace SpeezleGame.Core
         private readonly static int MinDimensions = 64;
         private readonly static int MaxDimensions = 4096;
 
-        public static int ScreenWidth = 1920;
-        public static int ScreenHeight = 1080;
+        public static int ScreenWidth = 1920; //test
+        public static int ScreenHeight = 1080; //test
         
 
         public int Width
@@ -28,12 +28,12 @@ namespace SpeezleGame.Core
         }
 
 
-        private Game game;
+        private SpeezleGame game;
         private RenderTarget2D target;
 
         private bool isSet;
 
-        public ScreenManager(Game game, int width, int height)
+        public ScreenManager(SpeezleGame game, int width, int height)
         {
             this.game = game;
             
@@ -84,16 +84,21 @@ namespace SpeezleGame.Core
 
         }
 
-        public void Display(SpriteHandler spriteHandler,bool textureFiltering = true)
+        public void Display(/*SpriteHandler spriteHandler, */Matrix transform, bool textureFiltering = true)
         {
 
-            game.GraphicsDevice.Clear(Color.HotPink);
+            game.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             Rectangle destinationRectangle = this.CalculateDestinationRectangle();
 
-            spriteHandler.Begin(textureFiltering);
+
+            game.backgroundRenderer.Begin(transform, textureFiltering);
+            game.backgroundRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
+            game.backgroundRenderer.End();
+
+            /*spriteHandler.Begin(textureFiltering, transform);
             spriteHandler.Draw(target, null, destinationRectangle, Color.White);
-            spriteHandler.End();
+            spriteHandler.End();*/
         }
     }
 }

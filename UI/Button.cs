@@ -51,7 +51,7 @@ namespace SpeezleGame.UI
         }
 
 
-        public override void Draw(SpriteBatch spriteBatch, SpriteHandler spriteHandler)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             var colour = Color.Red;
             if (isHovering)
@@ -59,16 +59,16 @@ namespace SpeezleGame.UI
                 colour = Color.Aqua;
                 
             }
-            spriteHandler.Draw(_texture, null, ButtonCollider, 0f, SpriteEffects.None, colour, Layer);
-            //spriteBatch.Draw(_texture, ButtonCollider, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+            //spriteBatch.Draw(_texture, null, ButtonCollider, 0f, SpriteEffects.None, colour, Layer);
+            spriteBatch.Draw(_texture, ButtonCollider, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
             
             if (!string.IsNullOrEmpty(Text))
             {
                 var x = (ButtonCollider.X + (ButtonCollider.Width / 2) - (_font.MeasureString(Text).X / 2));
                 var y = (ButtonCollider.Y + (ButtonCollider.Height / 2) - (_font.MeasureString(Text).Y / 2));
 
-                spriteHandler.DrawString(_font, Text, new Vector2(x, y), PenColour);
                 //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+                spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
             }
             
 

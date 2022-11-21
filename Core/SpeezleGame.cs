@@ -18,10 +18,13 @@ namespace SpeezleGame.Core
 {
     public class SpeezleGame : Game
     {
-        public GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager Graphics;
         private SpriteBatch _spriteBatch;
         private Color _backgroundColour = Color.CornflowerBlue;
 
+        public GUIRenderer guiRenderer;
+        public EntityRenderer entityRenderer;
+        public BackgroundRenderer backgroundRenderer;
 
         //private Player _player;
 
@@ -29,22 +32,25 @@ namespace SpeezleGame.Core
 
         public SpeezleGame()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            Graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
         protected override void Initialize()
         {
+            guiRenderer = new GUIRenderer(this);
+            entityRenderer = new EntityRenderer(this);
+            backgroundRenderer = new BackgroundRenderer(this);
 
 
 
-            _graphics.IsFullScreen = false;
-            _graphics.PreferredBackBufferWidth = ScreenManager.ScreenWidth;
-            _graphics.PreferredBackBufferHeight = ScreenManager.ScreenHeight;
-            _graphics.ApplyChanges(); //set temporary window size
+            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;//ScreenManager.ScreenWidth ;
+            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;//ScreenManager.ScreenHeight;
+            Graphics.IsFullScreen = true;
+            Graphics.ApplyChanges(); //set temporary window size
 
-            GameStateManager.Instance.Initialize(this);
+            GameStateManager.Instance.Initialize(this, guiRenderer, entityRenderer, backgroundRenderer);
 
             base.Initialize();
         }
@@ -54,7 +60,7 @@ namespace SpeezleGame.Core
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             GameStateManager.Instance.SetContent(Content);
-            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice));
+            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, backgroundRenderer ));
 
             //ScreenManager.Instance.LoadContent(Content, GraphicsDevice);
             

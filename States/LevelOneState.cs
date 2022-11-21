@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using SpeezleGame.Core;
+using SpeezleGame.Entities;
 
 namespace SpeezleGame.States
 {
@@ -22,6 +23,7 @@ namespace SpeezleGame.States
     {
 
         Player _player;
+
 
         private TileMapHandler _tileMapHandler;
         private TiledMap map; //
@@ -33,13 +35,18 @@ namespace SpeezleGame.States
         SpriteHandler spriteHandler;
 
         List<Component> _components;
+        List<BaseEntity> _entities = new List<BaseEntity>();
+        List<BaseEntity> _entitiesWoPlayer = new List<BaseEntity>();
 
         Texture2D mainMenuTexture;
         SpriteFont mainMenuFont;
 
+        Camera camera;
+
         ContentManager contentManager;
 
-        public LevelOneState(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+        public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer)
         {
             
         }
@@ -52,10 +59,15 @@ namespace SpeezleGame.States
         {
 
             HandleUIInitialization(contentManager);
+            guiRenderer.SetComponent(_components);
 
             HandleTileMap(contentManager);
+            backgroundRenderer.SetMapHandler(_tileMapHandler);
 
             HandlePlayerInitialization(contentManager);
+            entityRenderer.SetEntity(_entities);
+
+            camera = new Camera(_player);
         }
         public override void UnloadContent(ContentManager contentManager)
         {
@@ -64,27 +76,51 @@ namespace SpeezleGame.States
 
         public override void Update(GameTime gameTime)
         {
-            
 
             foreach (var component in _components)
                 component.Update(gameTime);
 
+            foreach (var entity in _entitiesWoPlayer)
+                entity.Update(gameTime);
+
             HandlePlayerUpdate(gameTime);
+            GameStateManager.UpdateCamera(camera.TransformMatrix);
+            camera.Follow();
+            //camera follow playr
         }
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void DrawGUI(GameTime gameTime)
+        {
+            foreach (Component comp in _components)
+            {
+                guiRenderer.Draw(gameTime);
+            }
+
+        }
+        public override void DrawEntity(GameTime gameTime)
+        {
+            foreach (BaseEntity entity in _entities)
+                entityRenderer.Draw(gameTime);
+        }
+        public override void DrawBackground(GameTime gameTime)
+        {
+            backgroundRenderer.Draw(gameTime);
+        }
+        /*public override void Draw(GameTime gameTime)
         {
             //_graphicsDevice.Clear(Color.CornflowerBlue);
 
+
+            
             DrawUI(spriteBatch);
 
-            _tileMapHandler.Draw(GameStateManager.transformMatrix, spriteHandler);
+            _tileMapHandler.Draw(SpriteBatch);
             _player.Draw(spriteBatch, gameTime, GameStateManager.transformMatrix, spriteHandler);
 
-        }
+        }*/
 
         private void MainMenuButton_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice));
+            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer));
         }
 
         private void HandleUIInitialization(ContentManager contentManager)
@@ -110,21 +146,7 @@ namespace SpeezleGame.States
             };
         }
 
-        private void DrawUI(SpriteBatch spriteBatch)
-        {
 
-
-            //spriteBatch.Begin(samplerState: SamplerState.LinearClamp);
-
-            foreach (var component in _components)
-            {
-                component.Draw(spriteBatch, spriteHandler);
-
-            }
-
-
-            //spriteBatch.End();
-        }
         private void HandlePlayerInitialization(ContentManager contentManager)
         {
             Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/main-char_idle_unarmed");
@@ -138,6 +160,7 @@ namespace SpeezleGame.States
 
 
             _player = new Player(playerContainer);
+            _entities.Add(_player);
         }
 
         private void HandlePlayerUpdate(GameTime gameTime)

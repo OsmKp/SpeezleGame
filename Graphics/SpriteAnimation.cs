@@ -51,11 +51,11 @@ namespace SpeezleGame.Graphics
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, SpriteHandler spriteHandler)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
         {
             var drawRect = new Rectangle(CurrentOffset * SpriteWidth, 0, SpriteWidth, SpriteHeight);
-            //spriteBatch.Draw(Texture, position, drawRect, Color.White, 0f, Vector2.Zero, Vector2.One, spriteEffects, 0f);
-            spriteHandler.Draw(Texture, drawRect, Vector2.Zero, position, 0f, Vector2.One, Color.White, spriteEffects);
+            spriteBatch.Draw(Texture, position, drawRect, Color.White, 0f, Vector2.Zero, Vector2.One, spriteEffects, 0f);
+            //spriteHandler.Draw(Texture, drawRect, Vector2.Zero, position, 0f, Vector2.One, Color.White, spriteEffects);
 
         }
 

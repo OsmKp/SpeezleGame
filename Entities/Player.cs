@@ -19,13 +19,13 @@ namespace SpeezleGame.Entities.Players
 {
 
 
-    public class Player : IGameEntity
+    public class Player : BaseEntity
     {
         private const int WALK_ANIM_SPRITE_COUNT = 4;
         private const int WALK_ANIM_SPRITE_SIZE = 32;
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
 
-        private Camera camera;
+        
 
         private readonly Vector2 gravity = new Vector2(0, 10f);
 
@@ -112,7 +112,7 @@ namespace SpeezleGame.Entities.Players
         public Player(PlayerTextureContainer container) 
         {
 
-            camera = new Camera(this);
+            
 
             Position = new Vector2(100, 200); // TEMP
             
@@ -128,7 +128,7 @@ namespace SpeezleGame.Entities.Players
             _renderingStateMachine.CurrentState.Animation.Play();
         }
 
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime, Matrix transformMatrix, SpriteHandler spriteHandler)
+        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime/*, Matrix transformMatrix, SpriteHandler spriteHandler*/)
         {
             SpriteEffects flip = SpriteEffects.None;
             
@@ -146,8 +146,12 @@ namespace SpeezleGame.Entities.Players
             
 
             //spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
-            _renderingStateMachine.Draw(spriteBatch, Position, flip, spriteHandler);
+            _renderingStateMachine.Draw(spriteBatch, Position, flip);
             //spriteBatch.End();
+        }
+        public override void Update(GameTime gameTime)
+        {
+            
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState, MouseState mouseState, /*MouseState previousMouseState,*/ List<Rectangle> RectangleCollisionObjects, List<TiledPolygon> PolygonCollisionObjects)

@@ -15,9 +15,9 @@ namespace SpeezleGame.Graphics
             Animation = animation;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, SpriteHandler spriteHandler)
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects)
         {
-            Animation?.Draw(spriteBatch, position, spriteEffects, spriteHandler);
+            Animation?.Draw(spriteBatch, position, spriteEffects);
         }
     }
 }

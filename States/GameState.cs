@@ -20,6 +20,11 @@ namespace SpeezleGame.States
     public abstract class GameState
     {
         protected GraphicsDevice _graphicsDevice;
+
+        protected GUIRenderer guiRenderer;
+        protected EntityRenderer entityRenderer;
+        protected BackgroundRenderer backgroundRenderer;
+        
         public KeyboardState KeyboardState
         {
             get
@@ -37,14 +42,20 @@ namespace SpeezleGame.States
             }
         }
 
-        public GameState(GraphicsDevice graphicsDevice)
+        public GameState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer)
         {
             _graphicsDevice = graphicsDevice;
+            this.guiRenderer = guiRenderer;
+            this.entityRenderer = entityRenderer;
+            this.backgroundRenderer = backgroundRenderer;
+
         }
         public abstract void Initialize(SpriteHandler sprite);
         public abstract void LoadContent(ContentManager content);
         public abstract void UnloadContent(ContentManager content);
         public abstract void Update(GameTime gameTime);
-        public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
+        public virtual void DrawEntity(GameTime gameTime) { }
+        public virtual void DrawGUI(GameTime gameTime) { }
+        public virtual void DrawBackground(GameTime gameTime) { }
     }
 }

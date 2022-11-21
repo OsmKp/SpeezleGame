@@ -27,13 +27,26 @@ namespace SpeezleGame.States
         SpriteFont playSoloFont;
 
 
-        public MainMenuState(GraphicsDevice graphics) : base(graphics)
+        public MainMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer)
         {
 
         }
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        public override void DrawGUI(GameTime gameTime)
         {
-            DrawUI(spriteBatch);
+            foreach(Component comp in _components)
+            {
+                guiRenderer.Draw(gameTime);
+            }
+            
+        }
+        public override void DrawEntity(GameTime gameTime)
+        {
+            base.DrawEntity(gameTime);
+        }
+        public override void DrawBackground(GameTime gameTime)
+        {
+            base.DrawBackground(gameTime);
         }
 
         public override void Initialize(SpriteHandler spriteHandler)
@@ -44,7 +57,7 @@ namespace SpeezleGame.States
         public override void LoadContent(ContentManager content)
         {
             HandleUIInitialization(content);
-            
+            guiRenderer.SetComponent(_components);
         }
 
         public override void UnloadContent(ContentManager content)
@@ -58,15 +71,7 @@ namespace SpeezleGame.States
             foreach (var component in _components)
                 component.Update(gameTime);
         }
-        private void DrawUI(SpriteBatch spriteBatch)
-        {
-            //spriteBatch.Begin(SpriteSortMode.BackToFront, samplerState: SamplerState.LinearClamp);
 
-            foreach (var component in _components)
-                component.Draw(spriteBatch, spritehandler);
-
-            //spriteBatch.End();
-        }
 
         private void HandleUIInitialization(ContentManager contentManager)
         {
@@ -112,7 +117,7 @@ namespace SpeezleGame.States
         {
             //load the next state
             
-            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice));
+            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer));
         }
 
     }
