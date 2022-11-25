@@ -6,16 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpeezleGame.Core
+namespace SpeezleGame.Renderers
 {
     public class EntityRenderer : BaseRenderer
     {
         List<BaseEntity> entities;
 
-        public EntityRenderer(SpeezleGame game) : base(game) { }
+        public EntityRenderer(Core.SpeezleGame game) : base(game) { }
         public override void Begin(Matrix transformMatrix, bool isTextureFilteringEnabled)
         {
             base.Begin(transformMatrix, isTextureFilteringEnabled);
+            
         }
 
         public void SetEntity(List<BaseEntity> entities)

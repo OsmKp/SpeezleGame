@@ -11,7 +11,7 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace SpeezleGame.Core
 {
-    public class SpriteHandler
+    /*public class SpriteHandler
     {
         //640 * 360
 
@@ -77,5 +77,5 @@ namespace SpeezleGame.Core
         }
 
 
-    }
+    }*/
 }

@@ -15,20 +15,21 @@ using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using SpeezleGame.Core;
+using SpeezleGame.Renderers;
 
 namespace SpeezleGame.States
 {
     public class MainMenuState : GameState
     {
         private List<Component> _components;
-        private SpriteHandler spritehandler;
+        
 
         Texture2D playSoloTexture;
         SpriteFont playSoloFont;
 
 
-        public MainMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer) : 
-            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer)
+        public MainMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game)
         {
 
         }
@@ -49,9 +50,9 @@ namespace SpeezleGame.States
             base.DrawBackground(gameTime);
         }
 
-        public override void Initialize(SpriteHandler spriteHandler)
+        public override void Initialize()
         {
-            this.spritehandler = spriteHandler;
+            
         }
 
         public override void LoadContent(ContentManager content)
@@ -112,12 +113,13 @@ namespace SpeezleGame.States
         private void Quit_Click(object sender, EventArgs e)
         {
             //_speezleGame.Exit();
+            game.Exit();
         }
         private void PlaySolo_Click(object sender, EventArgs e)
         {
             //load the next state
             
-            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer));
+            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game));
         }
 
     }

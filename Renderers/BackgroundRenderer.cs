@@ -7,13 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using TiledCS;
 
-namespace SpeezleGame.Core
+namespace SpeezleGame.Renderers
 {
     public class BackgroundRenderer : BaseRenderer
     {
         TileMapHandler tileMapHandler;
 
-        public BackgroundRenderer(SpeezleGame game) : base(game) { }
+        public BackgroundRenderer(Core.SpeezleGame game) : base(game) { }
 
         public override void Draw(GameTime gameTime)
         {
@@ -27,7 +27,7 @@ namespace SpeezleGame.Core
 
         public override void Initialize()
         {
-            
+
         }
     }
 }

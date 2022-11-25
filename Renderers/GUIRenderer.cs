@@ -9,16 +9,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Component = SpeezleGame.UI.Component;
 
-namespace SpeezleGame.Core
+
+namespace SpeezleGame.Renderers
 {
     public class GUIRenderer : BaseRenderer
     {
         List<Component> uiComponents;
 
-        public GUIRenderer(SpeezleGame game) : base(game) { }
+        public GUIRenderer(Core.SpeezleGame game) : base(game) { }
         public override void Initialize()
         {
-            
+
         }
 
         public void SetComponent(List<Component> components)

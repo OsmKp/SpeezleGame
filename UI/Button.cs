@@ -37,7 +37,12 @@ namespace SpeezleGame.UI
 
         private Rectangle ButtonCollider
         {
-            get { return new Rectangle((int)Position.X, (int) Position.Y, _texture.Width, _texture.Height); }
+            get { return new Rectangle((int)Math.Round(Position.X * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.X, 0), (int)Math.Round(Position.Y * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.Y, 0), (int)Math.Round(_texture.Width * ScreenManager.stretchRatio, 0), (int)Math.Round(_texture.Height * ScreenManager.stretchRatio)); }
+        }
+
+        private Rectangle ButtonDrawSize
+        {
+            get { return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height); }
         }
 
         public string Text { get; set; }
@@ -60,12 +65,12 @@ namespace SpeezleGame.UI
                 
             }
             //spriteBatch.Draw(_texture, null, ButtonCollider, 0f, SpriteEffects.None, colour, Layer);
-            spriteBatch.Draw(_texture, ButtonCollider, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+            spriteBatch.Draw(_texture, ButtonDrawSize, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
             
             if (!string.IsNullOrEmpty(Text))
             {
-                var x = (ButtonCollider.X + (ButtonCollider.Width / 2) - (_font.MeasureString(Text).X / 2));
-                var y = (ButtonCollider.Y + (ButtonCollider.Height / 2) - (_font.MeasureString(Text).Y / 2));
+                var x = (ButtonDrawSize.X + (ButtonDrawSize.Width / 2) - (_font.MeasureString(Text).X / 2));
+                var y = (ButtonDrawSize.Y + (ButtonDrawSize.Height / 2) - (_font.MeasureString(Text).Y / 2));
 
                 //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
                 spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);

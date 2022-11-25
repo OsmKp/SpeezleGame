@@ -14,6 +14,7 @@ using System.Diagnostics;
 using SpeezleGame.Physics;
 using Microsoft.Xna.Framework.Content;
 using SpeezleGame.Core;
+using Microsoft.Xna.Framework.Audio;
 
 namespace SpeezleGame.Entities.Players
 {
@@ -95,7 +96,7 @@ namespace SpeezleGame.Entities.Players
             get
             {
                 
-                return new Rectangle((int)Position.X + 8 , (int)Position.Y  , 16, 33);
+                return new Rectangle((int)Position.X + 2, (int)Position.Y  , 28, 33);
             }
         }
 
@@ -133,13 +134,13 @@ namespace SpeezleGame.Entities.Players
             SpriteEffects flip = SpriteEffects.None;
             
             //get which direction the player is facing and flip animations accordingly
-            if (Velocity.X > 0)
+            if (Velocity.X < 0)
                 flip = SpriteEffects.None;
-            else if (Velocity.X < 0)
+            else if (Velocity.X > 0)
                 flip = SpriteEffects.FlipHorizontally;
-            else if (lastMovement == 1.0f)
-                flip = SpriteEffects.None;
             else if (lastMovement == -1.0f)
+                flip = SpriteEffects.None;
+            else if (lastMovement == 1.0f)
                 flip = SpriteEffects.FlipHorizontally;
 
             //draw player
@@ -197,6 +198,7 @@ namespace SpeezleGame.Entities.Players
             {
                 movement = -1.0f;
                 lastMovement = -1.0f;
+                
             }
             else if (keyboardState.IsKeyDown(Keys.D))
             {

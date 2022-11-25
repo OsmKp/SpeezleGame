@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SpeezleGame.Renderers;
 using SpeezleGame.States;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace SpeezleGame.Core
         private static GameStateManager _instance;
         private Stack<GameState> _screens = new Stack<GameState>();
         private ScreenManager screenManager;
-        private SpriteHandler spriteHandler;
+        
         private SpeezleGame game;
         private int renderingTargetDimW = 640;
         private int renderingTargetDimH = 360;
@@ -59,7 +60,7 @@ namespace SpeezleGame.Core
 
             var MapSize = new Vector2(960, 320);
             screenManager = new ScreenManager(this.game, renderingTargetDimW, renderingTargetDimH);
-            spriteHandler = new SpriteHandler(this.game);
+            
 
             //transformMatrix = Matrix.CreateScale(new Vector3(Dimensions / MapSize, 1)); //a matrix that allows me to scale everything drawn on the screen
         }
@@ -87,7 +88,7 @@ namespace SpeezleGame.Core
                 // Add the screen to the stack
                 _screens.Push(screen);
                 // Initialize the screen
-                _screens.Peek().Initialize(spriteHandler);
+                _screens.Peek().Initialize();
                 // Call the LoadContent on the screen
                 if (Content != null)
                 {
@@ -165,6 +166,7 @@ namespace SpeezleGame.Core
 
                     EntityRenderer.End();
                     */
+
                     screenManager.Set();
 
                     backgroundRenderer.Begin(TransformMatrix, false);
@@ -175,21 +177,21 @@ namespace SpeezleGame.Core
                     _screens.Peek().DrawEntity(gameTime);
                     entityRenderer.End();
 
-                    guiRenderer.Begin(TransformMatrix, false);
+
+                    screenManager.UnSet();
+
+                    screenManager.SetGUI();
+
+                    guiRenderer.Begin(Matrix.Identity, false);
                     _screens.Peek().DrawGUI(gameTime);
                     guiRenderer.End();
 
-                    screenManager.UnSet();
+                    screenManager.UnSetGUI();
+
 
                     screenManager.Display(TransformMatrix);
 
-                   /* screenManager.Set();
-                    spriteHandler.Begin(false);
-                    _screens.Peek().Draw(gameTime);
-                    spriteHandler.End();
-                    screenManager.UnSet();
 
-                    screenManager.Display(spriteHandler, TransformMatrix);*/
                 }
             }
             catch (Exception ex)

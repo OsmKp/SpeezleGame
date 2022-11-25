@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using SpeezleGame.Core;
 using SpeezleGame.Entities;
+using SpeezleGame.Renderers;
 
 namespace SpeezleGame.States
 {
@@ -32,7 +33,7 @@ namespace SpeezleGame.States
         private TiledLayer collisionLayer; //
         private List<Rectangle> RectangleCollisionObjects;
         private List<TiledPolygon> PolygonCollisionObjects;
-        SpriteHandler spriteHandler;
+        
 
         List<Component> _components;
         List<BaseEntity> _entities = new List<BaseEntity>();
@@ -45,15 +46,15 @@ namespace SpeezleGame.States
 
         ContentManager contentManager;
 
-        public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer) : 
-            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer)
+        public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game)
         {
             
         }
 
-        public override void Initialize(SpriteHandler sprite)
+        public override void Initialize()
         {
-            spriteHandler = sprite;
+            
         }
         public override void LoadContent(ContentManager contentManager)
         {
@@ -67,7 +68,7 @@ namespace SpeezleGame.States
             HandlePlayerInitialization(contentManager);
             entityRenderer.SetEntity(_entities);
 
-            camera = new Camera(_player);
+            camera = new Camera(_player, _graphicsDevice.Viewport);
         }
         public override void UnloadContent(ContentManager contentManager)
         {
@@ -88,12 +89,10 @@ namespace SpeezleGame.States
             camera.Follow();
             //camera follow playr
         }
-        public override void DrawGUI(GameTime gameTime)
+
+        public override void DrawBackground(GameTime gameTime)
         {
-            foreach (Component comp in _components)
-            {
-                guiRenderer.Draw(gameTime);
-            }
+            backgroundRenderer.Draw(gameTime);
 
         }
         public override void DrawEntity(GameTime gameTime)
@@ -101,9 +100,15 @@ namespace SpeezleGame.States
             foreach (BaseEntity entity in _entities)
                 entityRenderer.Draw(gameTime);
         }
-        public override void DrawBackground(GameTime gameTime)
+
+
+        public override void DrawGUI(GameTime gameTime)
         {
-            backgroundRenderer.Draw(gameTime);
+            foreach (Component comp in _components)
+            {
+                guiRenderer.Draw(gameTime);
+            }
+
         }
         /*public override void Draw(GameTime gameTime)
         {
@@ -120,7 +125,7 @@ namespace SpeezleGame.States
 
         private void MainMenuButton_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer));
+            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game));
         }
 
         private void HandleUIInitialization(ContentManager contentManager)
@@ -149,8 +154,8 @@ namespace SpeezleGame.States
 
         private void HandlePlayerInitialization(ContentManager contentManager)
         {
-            Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/main-char_idle_unarmed");
-            Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/main-char_walk_unarmed");
+            Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/HogRiderIdleAnimPngBetter");
+            Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/HogRiderWalkAnimPng-Sheet");
 
             PlayerTextureContainer playerContainer = new PlayerTextureContainer()
             {

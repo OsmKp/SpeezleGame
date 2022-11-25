@@ -13,6 +13,7 @@ using SpeezleGame.UI;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using SpeezleGame.States;
+using SpeezleGame.Renderers;
 
 namespace SpeezleGame.Core
 {
@@ -47,7 +48,7 @@ namespace SpeezleGame.Core
 
             Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;//ScreenManager.ScreenWidth ;
             Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;//ScreenManager.ScreenHeight;
-            Graphics.IsFullScreen = true;
+            Graphics.IsFullScreen = false;
             Graphics.ApplyChanges(); //set temporary window size
 
             GameStateManager.Instance.Initialize(this, guiRenderer, entityRenderer, backgroundRenderer);
@@ -60,7 +61,7 @@ namespace SpeezleGame.Core
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             GameStateManager.Instance.SetContent(Content);
-            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, backgroundRenderer ));
+            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, this ));
 
             //ScreenManager.Instance.LoadContent(Content, GraphicsDevice);
             

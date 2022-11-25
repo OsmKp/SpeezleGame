@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,11 +29,15 @@ namespace SpeezleGame.Core
             get { return target.Height; } 
         }
 
+        public static float stretchRatio;
+        public static Vector2 shiftAmountVector;
 
         private SpeezleGame game;
         private RenderTarget2D target;
+        private RenderTarget2D target2;
 
         private bool isSet;
+        private bool isSet2;
 
         public ScreenManager(SpeezleGame game, int width, int height)
         {
@@ -41,6 +47,7 @@ namespace SpeezleGame.Core
             width = MathHelper.Clamp(width, MinDimensions, MaxDimensions);
 
             target = new RenderTarget2D(game.GraphicsDevice, width, height);
+            target2 = new RenderTarget2D(game.GraphicsDevice, width, height);
             isSet = false;
         }
 
@@ -48,7 +55,19 @@ namespace SpeezleGame.Core
         {
             game.GraphicsDevice.SetRenderTarget(target);
             isSet = true;
-            game.GraphicsDevice.Clear(Color.CornflowerBlue);
+            game.GraphicsDevice.Clear(Color.LightSkyBlue);
+        }
+        public void SetGUI()
+        {
+            game.GraphicsDevice.SetRenderTarget(target2);
+            isSet2 = true;
+            game.GraphicsDevice.Clear(Color.Transparent);
+        }
+
+        public void UnSetGUI()
+        {
+            game.GraphicsDevice.SetRenderTarget(null);
+            isSet2 = false;
         }
 
         public void UnSet()
@@ -80,6 +99,9 @@ namespace SpeezleGame.Core
             }
 
             Rectangle result = new Rectangle((int)rectX, (int)rectY, (int)rectWidth, (int)rectHeight);
+            stretchRatio = rectWidth / target.Width;
+            shiftAmountVector = new Vector2(rectX, rectY);
+
             return result;
 
         }
@@ -87,18 +109,26 @@ namespace SpeezleGame.Core
         public void Display(/*SpriteHandler spriteHandler, */Matrix transform, bool textureFiltering = true)
         {
 
-            game.GraphicsDevice.Clear(Color.CornflowerBlue);
+           game.GraphicsDevice.Clear(Color.Black);
 
             Rectangle destinationRectangle = this.CalculateDestinationRectangle();
+            Debug.WriteLine("width " + destinationRectangle.Width + "height " + destinationRectangle.Height);
 
+           
 
-            game.backgroundRenderer.Begin(transform, textureFiltering);
+            game.backgroundRenderer.Begin(Matrix.Identity, textureFiltering);
             game.backgroundRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
             game.backgroundRenderer.End();
+
+            game.guiRenderer.Begin(Matrix.Identity, textureFiltering);
+            game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White);
+            game.guiRenderer.End();
+
 
             /*spriteHandler.Begin(textureFiltering, transform);
             spriteHandler.Draw(target, null, destinationRectangle, Color.White);
             spriteHandler.End();*/
         }
+        //public void Display()
     }
 }

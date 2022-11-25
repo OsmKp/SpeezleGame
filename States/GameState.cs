@@ -13,13 +13,14 @@ using System.Reflection.Metadata;
 using TiledCS;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
-using SpeezleGame.Core;
+using SpeezleGame.Renderers;
 
 namespace SpeezleGame.States
 {
     public abstract class GameState
     {
         protected GraphicsDevice _graphicsDevice;
+        protected SpeezleGame.Core.SpeezleGame game;
 
         protected GUIRenderer guiRenderer;
         protected EntityRenderer entityRenderer;
@@ -42,15 +43,15 @@ namespace SpeezleGame.States
             }
         }
 
-        public GameState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer)
+        public GameState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game)
         {
             _graphicsDevice = graphicsDevice;
             this.guiRenderer = guiRenderer;
             this.entityRenderer = entityRenderer;
             this.backgroundRenderer = backgroundRenderer;
-
+            this.game = game;
         }
-        public abstract void Initialize(SpriteHandler sprite);
+        public abstract void Initialize();
         public abstract void LoadContent(ContentManager content);
         public abstract void UnloadContent(ContentManager content);
         public abstract void Update(GameTime gameTime);

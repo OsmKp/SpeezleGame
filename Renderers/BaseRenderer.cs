@@ -6,29 +6,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpeezleGame.Core
+namespace SpeezleGame.Renderers
 {
     public abstract class BaseRenderer
     {
-        private SpeezleGame game;
-        public SpeezleGame Game
+        private Core.SpeezleGame game;
+        public Core.SpeezleGame Game
         {
             get { return game; }
         }
 
         public GraphicsDevice GraphicsDevice
         {
-            get { return this.Game.GraphicsDevice; }
+            get { return Game.GraphicsDevice; }
         }
         public GraphicsDeviceManager Graphics
         {
-            get { return this.Game.Graphics; }
+            get { return Game.Graphics; }
             //set { this.Game.GraphicsDevice = value; }
         }
-        public BaseRenderer(SpeezleGame game)
+        public BaseRenderer(Core.SpeezleGame game)
         {
             this.game = game;
-            this.spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         private SpriteBatch spriteBatch;
@@ -36,11 +36,12 @@ namespace SpeezleGame.Core
         {
             get { return spriteBatch; }
         }
+
         public virtual void Begin(Matrix transformMatrix, bool isTextureFilteringEnabled)
         {
             SamplerState sampler = SamplerState.PointClamp;
             if (isTextureFilteringEnabled)
-                sampler = SamplerState.LinearClamp;
+                sampler = SamplerState.PointClamp;
             SpriteBatch.Begin(samplerState: sampler, transformMatrix: transformMatrix);
         }
         public virtual void End()
