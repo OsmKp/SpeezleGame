@@ -24,6 +24,8 @@ namespace SpeezleGame.UI
         private bool isHovering;
 
         private Texture2D _texture;
+        private const int horizontalStretch = 4;
+        private const int verticalStretch = 3;
 
 
         public event EventHandler Click;
@@ -37,12 +39,12 @@ namespace SpeezleGame.UI
 
         private Rectangle ButtonCollider
         {
-            get { return new Rectangle((int)Math.Round(Position.X * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.X, 0), (int)Math.Round(Position.Y * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.Y, 0), (int)Math.Round(_texture.Width * ScreenManager.stretchRatio, 0), (int)Math.Round(_texture.Height * ScreenManager.stretchRatio)); }
+            get { return new Rectangle((int)Math.Round(Position.X * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.X, 0), (int)Math.Round(Position.Y * ScreenManager.stretchRatio, 0) + (int)Math.Round(ScreenManager.shiftAmountVector.Y, 0), (int)Math.Round(_texture.Width* horizontalStretch * ScreenManager.stretchRatio, 0), (int)Math.Round(_texture.Height* verticalStretch * ScreenManager.stretchRatio)); }
         }
 
         private Rectangle ButtonDrawSize
         {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height); }
+            get { return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width * horizontalStretch, _texture.Height * verticalStretch); }
         }
 
         public string Text { get; set; }
@@ -52,16 +54,16 @@ namespace SpeezleGame.UI
             _texture = texture;
             _font = font;
             
-            PenColour = Color.BlueViolet;
+            PenColour = Color.White;
         }
 
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            var colour = Color.Red;
+            var colour = Color.White;
             if (isHovering)
             {
-                colour = Color.Aqua;
+                colour = Color.DarkGray;
                 
             }
             //spriteBatch.Draw(_texture, null, ButtonCollider, 0f, SpriteEffects.None, colour, Layer);
@@ -69,8 +71,8 @@ namespace SpeezleGame.UI
             
             if (!string.IsNullOrEmpty(Text))
             {
-                var x = (ButtonDrawSize.X + (ButtonDrawSize.Width / 2) - (_font.MeasureString(Text).X / 2));
-                var y = (ButtonDrawSize.Y + (ButtonDrawSize.Height / 2) - (_font.MeasureString(Text).Y / 2));
+                var x = (ButtonDrawSize.X + (ButtonDrawSize.Width / 2) - (_font.MeasureString(Text).X / 2) );
+                var y = (ButtonDrawSize.Y + (ButtonDrawSize.Height / 2) - (_font.MeasureString(Text).Y / 2) - 4);
 
                 //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
                 spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);

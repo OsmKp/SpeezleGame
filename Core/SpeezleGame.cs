@@ -25,6 +25,7 @@ namespace SpeezleGame.Core
 
         public GUIRenderer guiRenderer;
         public EntityRenderer entityRenderer;
+        public TileRenderer tileRenderer;
         public BackgroundRenderer backgroundRenderer;
 
         //private Player _player;
@@ -43,6 +44,7 @@ namespace SpeezleGame.Core
             guiRenderer = new GUIRenderer(this);
             entityRenderer = new EntityRenderer(this);
             backgroundRenderer = new BackgroundRenderer(this);
+            tileRenderer = new TileRenderer(this);
 
 
 
@@ -51,7 +53,7 @@ namespace SpeezleGame.Core
             Graphics.IsFullScreen = false;
             Graphics.ApplyChanges(); //set temporary window size
 
-            GameStateManager.Instance.Initialize(this, guiRenderer, entityRenderer, backgroundRenderer);
+            GameStateManager.Instance.Initialize(this, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,GraphicsDevice);
 
             base.Initialize();
         }
@@ -61,7 +63,7 @@ namespace SpeezleGame.Core
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             GameStateManager.Instance.SetContent(Content);
-            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, this ));
+            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,this ));
 
             //ScreenManager.Instance.LoadContent(Content, GraphicsDevice);
             

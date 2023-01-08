@@ -43,11 +43,22 @@ namespace SpeezleGame.Core
             if(xFactor < 0.01f)
                 xFactor = xFactor * 2;
             camPos.X += xFactor;
+
+            if(camPos.X < 0)
+            {
+                camPos.X = 0;
+            }
+            else if(camPos.X + 640 > 1920)
+            {
+                camPos.X = 1920 - 640;
+            }
+
             float yFactor = (target.Y - camPos.Y) / 8;
             if (yFactor < 0.01f)
                 yFactor = yFactor * 10;
             Debug.WriteLine(yFactor);
             camPos.Y += yFactor;
+
         }
 
 

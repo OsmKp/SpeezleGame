@@ -32,6 +32,28 @@
 /processorParam:TextureFormat=Compressed
 /build:Test/FontTest.spritefont
 
+#begin Test/generalFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Test/generalFont.spritefont
+
+#begin Test/GreyButton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Test/GreyButton.png
+
+#begin Test/MinimalPixelFont.ttf
+/copy:Test/MinimalPixelFont.ttf
+
 #begin Test/SpeezleTileSetPng.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -55,6 +77,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Test/TestButton.png
+
+#begin Test/WhiteLabel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Test/WhiteLabel.png
 
 #begin Textures/AnimationTestBigCharacter.png
 /importer:TextureImporter
@@ -80,6 +114,30 @@
 /processorParam:TextureFormat=Color
 /build:Textures/burning_loop_1.png
 
+#begin Textures/CloudBackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/CloudBackground.png
+
+#begin Textures/HogRiderDashAnim.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/HogRiderDashAnim.png
+
 #begin Textures/HogRiderIdleAnimPng.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -104,6 +162,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/HogRiderIdleAnimPngBetter.png
 
+#begin Textures/HogRiderSlideAnim.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/HogRiderSlideAnim.png
+
 #begin Textures/HogRiderWalkAnimPng-Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -115,6 +185,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/HogRiderWalkAnimPng-Sheet.png
+
+#begin Textures/LevelBackground.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/LevelBackground.png
 
 #begin Textures/main-char_idle_unarmed.png
 /importer:TextureImporter

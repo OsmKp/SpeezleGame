@@ -17,6 +17,7 @@ using System.Security.Cryptography.X509Certificates;
 using SpeezleGame.Core;
 using SpeezleGame.Entities;
 using SpeezleGame.Renderers;
+using SpeezleGame.Graphics;
 
 namespace SpeezleGame.States
 {
@@ -25,13 +26,21 @@ namespace SpeezleGame.States
 
         Player _player;
 
+        
+        private Background _background;
 
         private TileMapHandler _tileMapHandler;
         private TiledMap map; //
         private Dictionary<int, TiledTileset> tilesets; //
         private Texture2D tilesetTexture; //
         private TiledLayer collisionLayer; //
+        private TiledLayer teleportLayer;
+
+        private Dictionary<string, List<Rectangle>> RectangleMapObjects;
+
+        private List<Rectangle> RectangleTeleportObjects;
         private List<Rectangle> RectangleCollisionObjects;
+
         private List<TiledPolygon> PolygonCollisionObjects;
         
 
@@ -46,8 +55,8 @@ namespace SpeezleGame.States
 
         ContentManager contentManager;
 
-        public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
-            base(graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game)
+        public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer,backgroundRenderer ,game)
         {
             
         }
@@ -58,15 +67,23 @@ namespace SpeezleGame.States
         }
         public override void LoadContent(ContentManager contentManager)
         {
+            Debug.WriteLine("called load content");
+
+            HandleBackgroundInitialization(contentManager);
+            backgroundRenderer.SetBackground(_background);
+
+            HandleTileMap(contentManager);
+            tileRenderer.SetMapHandler(_tileMapHandler);
+
+            HandlePlayerInitialization(contentManager);
+            entityRenderer.SetEntity(_entities);
 
             HandleUIInitialization(contentManager);
             guiRenderer.SetComponent(_components);
 
-            HandleTileMap(contentManager);
-            backgroundRenderer.SetMapHandler(_tileMapHandler);
+            
 
-            HandlePlayerInitialization(contentManager);
-            entityRenderer.SetEntity(_entities);
+            
 
             camera = new Camera(_player, _graphicsDevice.Viewport);
         }
@@ -90,9 +107,9 @@ namespace SpeezleGame.States
             //camera follow playr
         }
 
-        public override void DrawBackground(GameTime gameTime)
+        public override void DrawTile(GameTime gameTime)
         {
-            backgroundRenderer.Draw(gameTime);
+            tileRenderer.Draw(gameTime);
 
         }
         public override void DrawEntity(GameTime gameTime)
@@ -101,6 +118,10 @@ namespace SpeezleGame.States
                 entityRenderer.Draw(gameTime);
         }
 
+        public override void DrawBackground(GameTime gameTime)
+        {
+            backgroundRenderer.Draw(gameTime);
+        }
 
         public override void DrawGUI(GameTime gameTime)
         {
@@ -125,14 +146,14 @@ namespace SpeezleGame.States
 
         private void MainMenuButton_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, backgroundRenderer, game));
+            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game));
         }
 
         private void HandleUIInitialization(ContentManager contentManager)
         {
             //main menu
-            mainMenuTexture = contentManager.Load<Texture2D>("Test/TestButton");
-            mainMenuFont = contentManager.Load<SpriteFont>("Test/FontTest");
+            mainMenuTexture = contentManager.Load<Texture2D>("Test/GreyButton");
+            mainMenuFont = contentManager.Load<SpriteFont>("Test/generalFont");
             //
 
             //MainMenu Button
@@ -151,26 +172,36 @@ namespace SpeezleGame.States
             };
         }
 
+        private void HandleBackgroundInitialization(ContentManager contentManager)
+        {
+            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/LevelBackground");
+            _background = new Background(backgroundTexture);
+        }
 
         private void HandlePlayerInitialization(ContentManager contentManager)
         {
+            Debug.WriteLine("but player init called");
             Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/HogRiderIdleAnimPngBetter");
             Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/HogRiderWalkAnimPng-Sheet");
+            Texture2D dashTexture = contentManager.Load<Texture2D>("Textures/HogRiderDashAnim");
+            Texture2D slideTexture = contentManager.Load<Texture2D>("Textures/HogRiderSlideAnim");
 
             PlayerTextureContainer playerContainer = new PlayerTextureContainer()
             {
                 Idle = idleTexture,
-                Walk = walkTexture
+                Walk = walkTexture,
+                Dash = dashTexture,
+                Slide = slideTexture
             };
 
 
-            _player = new Player(playerContainer);
+            _player = new Player(playerContainer, _graphicsDevice);
             _entities.Add(_player);
         }
 
         private void HandlePlayerUpdate(GameTime gameTime)
         {
-            _player.Update(gameTime, KeyboardState, MouseState,/*PreviousMouseState,*/RectangleCollisionObjects, PolygonCollisionObjects); //update player every frame //note to myseld: fix polygon collision objects
+            _player.Update(gameTime, KeyboardState, MouseState,/*PreviousMouseState,*/RectangleMapObjects, PolygonCollisionObjects); //update player every frame //note to myseld: fix polygon collision objects
         }
         private void HandleTileMap(ContentManager contentManager)
         {
@@ -178,14 +209,27 @@ namespace SpeezleGame.States
             tilesets = map.GetTiledTilesets("Content/Test/");
             tilesetTexture = contentManager.Load<Texture2D>("Test/SpeezleTileSetPng");
             collisionLayer = map.Layers.First(l => l.name == "Collidable");
+            teleportLayer = map.Layers.First(l => l.name == "Teleport");
             _tileMapHandler = new TileMapHandler(_graphicsDevice, map, tilesets, tilesetTexture);
 
+            RectangleMapObjects = new Dictionary<string, List<Rectangle>>();
+
             RectangleCollisionObjects = new List<Rectangle>();
+            RectangleTeleportObjects = new List<Rectangle>();
+
+
             PolygonCollisionObjects = new List<TiledPolygon>();
             foreach (var obj in collisionLayer.objects) //get all the collidable objects on the map
             {
                 RectangleCollisionObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
             }
+            foreach (var obj in teleportLayer.objects) //get all the teleport objects on the map
+            {
+                RectangleTeleportObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
+            }
+
+            RectangleMapObjects.Add("CollisionObjects", RectangleCollisionObjects);
+            RectangleMapObjects.Add("TeleportObjects", RectangleTeleportObjects);
         }
     }
 }

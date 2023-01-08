@@ -116,9 +116,9 @@ namespace SpeezleGame.Core
 
            
 
-            game.backgroundRenderer.Begin(Matrix.Identity, textureFiltering);
-            game.backgroundRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
-            game.backgroundRenderer.End();
+            game.tileRenderer.Begin(Matrix.Identity, textureFiltering);
+            game.tileRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
+            game.tileRenderer.End();
 
             game.guiRenderer.Begin(Matrix.Identity, textureFiltering);
             game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White);

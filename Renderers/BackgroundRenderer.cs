@@ -1,33 +1,43 @@
 ﻿using Microsoft.Xna.Framework;
-using SpeezleGame.Physics;
+using SpeezleGame.Entities;
+using SpeezleGame.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TiledCS;
 
 namespace SpeezleGame.Renderers
 {
     public class BackgroundRenderer : BaseRenderer
     {
-        TileMapHandler tileMapHandler;
+        Background background;
+        public BackgroundRenderer(Core.SpeezleGame game) : base(game)
+        {
 
-        public BackgroundRenderer(Core.SpeezleGame game) : base(game) { }
-
+        }
+        public void SetBackground(Background bg)
+        {
+            this.background = bg;
+        }
         public override void Draw(GameTime gameTime)
         {
-            tileMapHandler.Draw(SpriteBatch);
-        }
-
-        public void SetMapHandler(TileMapHandler handler)
-        {
-            tileMapHandler = handler;
+            background.Draw(SpriteBatch);
         }
 
         public override void Initialize()
         {
+            
+        }
 
+        public override void Begin(Matrix transformMatrix, bool isTextureFilteringEnabled)
+        {
+            base.Begin(transformMatrix, isTextureFilteringEnabled);
+        }
+
+        public override void End()
+        {
+            base.End();
         }
     }
 }

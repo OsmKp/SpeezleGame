@@ -18,8 +18,9 @@ namespace SpeezleGame.Core
     {
         GUIRenderer guiRenderer;
         EntityRenderer entityRenderer;
+        TileRenderer tileRenderer;
         BackgroundRenderer backgroundRenderer;
-
+        GraphicsDevice graphicsDevice;
 
         private ContentManager Content;
         private static GameStateManager _instance;
@@ -51,12 +52,14 @@ namespace SpeezleGame.Core
             
         }
 
-        public void Initialize(SpeezleGame game, GUIRenderer guiRenderer, EntityRenderer entityRenderer, BackgroundRenderer backgroundRenderer)
+        public void Initialize(SpeezleGame game, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, GraphicsDevice graphicsDevice)
         {
             this.game = game;
             this.guiRenderer = guiRenderer;
             this.entityRenderer = entityRenderer;
+            this.tileRenderer = tileRenderer;
             this.backgroundRenderer = backgroundRenderer;
+            this.graphicsDevice = graphicsDevice;
 
             var MapSize = new Vector2(960, 320);
             screenManager = new ScreenManager(this.game, renderingTargetDimW, renderingTargetDimH);
@@ -88,7 +91,9 @@ namespace SpeezleGame.Core
                 // Add the screen to the stack
                 _screens.Push(screen);
                 // Initialize the screen
-                _screens.Peek().Initialize();
+
+                _screens.Peek().Initialize(); 
+                
                 // Call the LoadContent on the screen
                 if (Content != null)
                 {
@@ -140,6 +145,14 @@ namespace SpeezleGame.Core
             }
         }
 
+
+        public void LoadEndScreen(int timeInLevel, string levelName, int coinsCollected)
+        {
+            
+            this.ChangeScreen(new EndOfLevelState(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer ,game));
+            _screens.Peek().InitializeForEnd(timeInLevel, levelName, coinsCollected);
+        }
+
         public void Update(GameTime gameTime)
         {
             try
@@ -169,9 +182,13 @@ namespace SpeezleGame.Core
 
                     screenManager.Set();
 
-                    backgroundRenderer.Begin(TransformMatrix, false);
+                    backgroundRenderer.Begin(Matrix.Identity, false);
                     _screens.Peek().DrawBackground(gameTime);
                     backgroundRenderer.End();
+
+                    tileRenderer.Begin(TransformMatrix, false);
+                    _screens.Peek().DrawTile(gameTime);
+                    tileRenderer.End();
 
                     entityRenderer.Begin(TransformMatrix, false);
                     _screens.Peek().DrawEntity(gameTime);
