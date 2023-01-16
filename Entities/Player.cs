@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Content;
 using SpeezleGame.Core;
 using Microsoft.Xna.Framework.Audio;
 using SpeezleGame.States;
+using SpeezleGame.MapComponents;
 
 namespace SpeezleGame.Entities.Players
 {
@@ -94,7 +95,7 @@ namespace SpeezleGame.Entities.Players
         private bool isSlidingLocked;
         private bool wasSliding;
         private float slideTime;
-        private const float slideCD = 3.0f;
+        private const float slideCD = 5.0f;
         private float slideCDTimer;
 
         //variables and constants for dashing
@@ -103,8 +104,11 @@ namespace SpeezleGame.Entities.Players
         private bool isDashLocked ;
         //private bool wasDashing ;
         private float dashTime;
-        private const float dashCD = 1.0f;
+        private const float dashCD = 5.0f;
         private float dashCDTimer;
+
+        public string DashCooldownString;
+        public string SlideCooldownString;
 
         //variables  for jumping
         private bool isJumping;
@@ -121,6 +125,16 @@ namespace SpeezleGame.Entities.Players
                 return new Rectangle((int)Position.X + 2, (int)Position.Y  , 28, 33);
             }
         }
+
+        private List<MapObject> mapObjectsToNotRender = new List<MapObject>();
+
+        private float TeleportCooldown = 10f;
+        private float TeleportCounter;
+        private bool TeleportLocked;
+
+        private float DoorCooldown = 10f;
+        private float DoorCounter;
+        private bool DoorLocked;
 
         private const float EPSILON = 0.00001f;
         public int DrawOrder { get; set; }
@@ -181,18 +195,18 @@ namespace SpeezleGame.Entities.Players
             
         }
 
-        public void Update(GameTime gameTime, KeyboardState keyboardState, MouseState mouseState, Dictionary<string, List<Rectangle>> RectangleMapObjects ,List<TiledPolygon> PolygonCollisionObjects)
+        public void Update(GameTime gameTime, KeyboardState keyboardState, MouseState mouseState,  List<Rectangle> RectangleMapObjects ,List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
         {
             if (!posInitialized)
             {
                 posInitialized = true;
-                Position = new Vector2(40, 150);
+                Position = new Vector2(40, 750);
             }
             
 
             GetInput(keyboardState, mouseState/*, previousMouseState*/ ); //first get what keys are pressed each frame
 
-            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects); //apply physics and process key presses
+            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects, mapObjects); //apply physics and process key presses
 
 
             //set the correct animation depending on the player velocity
@@ -283,7 +297,7 @@ namespace SpeezleGame.Entities.Players
 
         }
 
-        public void ApplyPhysics(GameTime gameTime, Dictionary<string, List<Rectangle>> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects)
+        public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
         {
 
 
@@ -316,7 +330,7 @@ namespace SpeezleGame.Entities.Players
             Position += velocity * elapsed; //change the position by using the velocity
             Position = new Vector2((float)Math.Round(Position.X), (float)Math.Round(Position.Y));
 
-            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(), elapsed); //handle collisions after moving
+            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(), mapObjects, elapsed); //handle collisions after moving
 
 
             //if collision is detected re adjust position
@@ -381,8 +395,12 @@ namespace SpeezleGame.Entities.Players
             }
 
 
-            Debug.WriteLine("Cooldown of slide: " + Math.Round(slideCD - slideCDTimer, MidpointRounding.AwayFromZero)); // debuggin purp
-
+            Debug.WriteLine("Cooldown of slide: " + Math.Round(slideCD - slideCDTimer)); // debuggin purp
+            SlideCooldownString = Math.Round(slideCD - slideCDTimer, MidpointRounding.AwayFromZero).ToString();
+            if(!isSlidingLocked)
+            {
+                SlideCooldownString = "Ready";
+            }
 
             wasSliding = isSliding;
             return VelocityX;
@@ -439,10 +457,16 @@ namespace SpeezleGame.Entities.Players
             }
             
 
-            Debug.WriteLine("Cooldown: " + Math.Round(dashCD - dashCDTimer, MidpointRounding.AwayFromZero)); // debuggin purp
+            Debug.WriteLine("Cooldown: " + Math.Round(dashCD - dashCDTimer)); // debuggin purp
+
+            DashCooldownString = Math.Round(dashCD - dashCDTimer, MidpointRounding.AwayFromZero).ToString();
+            if (!isDashLocked)
+            {
+                DashCooldownString = "Ready";
+            }
 
 
-            
+
             return VelocityX;
 
         }
@@ -487,7 +511,7 @@ namespace SpeezleGame.Entities.Players
             wasJumping = isJumping;
             return velocityY;
         }
-        private void HandleCollisions(Dictionary<string, List<Rectangle>> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, float elapsed)
+        private void HandleCollisions(List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects,float elapsed)
         {
 
             
@@ -495,7 +519,7 @@ namespace SpeezleGame.Entities.Players
             
             
             
-            HandleRectangleRectangleCollisions(RectangleMapObjects); //handle collisions with rectangle objects
+            HandleRectangleRectangleCollisions(RectangleMapObjects, mapObjects, elapsed); //handle collisions with rectangle objects
         }
 
         /*private void HandleRaycastCollision(List<Rectangle> RectangleCollisionObjects, float elapsed)
@@ -524,75 +548,212 @@ namespace SpeezleGame.Entities.Players
             
 
         }*/
-        private void HandleRectangleRectangleCollisions(Dictionary<string, List<Rectangle>> RectangleMapObjects)
+        private void HandleRectangleRectangleCollisions(List<Rectangle> RectangleMapObjects, List<MapObject> mapObjects, float elapsed)
         {
             Rectangle bounds = playerBounds;
             isOnGround = false;
 
-            foreach(KeyValuePair<string, List<Rectangle>> kvp in RectangleMapObjects)
+            foreach(var collisionObject in RectangleMapObjects)
             {
-                if (kvp.Key == "CollisionObjects")
+
+                if (bounds.Intersects(collisionObject))
                 {
-                    foreach(var collisionObject in kvp.Value)
+                    Vector2 depth = Physics.RectangleExtensions.GetIntersectionDepth(bounds, collisionObject);
+                    if (depth != Vector2.Zero)
                     {
-                        if (bounds.Intersects(collisionObject))
+                        float absDepthX = Math.Abs(depth.X);
+                        float absDepthY = Math.Abs(depth.Y);
+
+                        // Resolve the collision along the shallow axis.
+                        if (absDepthY < absDepthX)
                         {
-                            Vector2 depth = Physics.RectangleExtensions.GetIntersectionDepth(bounds, collisionObject);
-                            if (depth != Vector2.Zero)
+
+                            if (previousBottom <= collisionObject.Top)
+                                isOnGround = true;
+
+
+                            if (IsOnGround)
                             {
-                                float absDepthX = Math.Abs(depth.X);
-                                float absDepthY = Math.Abs(depth.Y);
+                                // Resolve the collision along the Y axis.
+                                Position = new Vector2(Position.X, Position.Y + depth.Y);
 
-                                // Resolve the collision along the shallow axis.
-                                if (absDepthY < absDepthX)
+                                bounds = playerBounds;
+                            }
+                            else
+                            {
+                                Position = new Vector2(Position.X, Position.Y + depth.Y);
+                            }
+
+                        }
+                        else
+                        {
+                            Position = new Vector2(Position.X + depth.X, Position.Y);
+
+                            // Perform further collisions with the new bounds.
+                            bounds = playerBounds;
+                        }
+                    }
+
+                }
+                
+            }
+            previousBottom = bounds.Bottom;
+            foreach (var mapObject in mapObjects)
+            {
+                HandleDebounce(elapsed);
+
+                if (bounds.Intersects(mapObject.Bounds))
+                {
+                    TeleportObject tpObj = mapObject as TeleportObject;
+                    LeverObject leverObj = mapObject as LeverObject;
+                    DoorObject doorObj = mapObject as DoorObject;
+                    if (tpObj != null && !TeleportLocked)
+                    {
+                        TeleportObject destination = FindObjectFromID(tpObj.TargetID, mapObjects) as TeleportObject;
+                        Position = new Vector2(destination.Bounds.X, destination.Bounds.Y);
+                        TeleportLocked = true;
+                    }
+                    else if(leverObj != null && !DoorLocked)
+                    {
+                        DoorLocked = true;
+                        DoorObject targetDoor = FindObjectFromID(leverObj.TargetDoorID, mapObjects) as DoorObject;
+                        targetDoor.ChangeDoorState();
+                        if (mapObjectsToNotRender.Contains(targetDoor))
+                            mapObjectsToNotRender.Remove(targetDoor);
+                        else
+                            mapObjectsToNotRender.Add(targetDoor);
+
+                    }
+                    else if(doorObj != null && doorObj.IsOpen == false)
+                    {
+                        Vector2 depth = Physics.RectangleExtensions.GetIntersectionDepth(bounds, doorObj.Bounds);
+                        if (depth != Vector2.Zero)
+                        {
+                            float absDepthX = Math.Abs(depth.X);
+                            float absDepthY = Math.Abs(depth.Y);
+
+                            // Resolve the collision along the shallow axis.
+                            if (absDepthY < absDepthX)
+                            {
+
+                                if (previousBottom <= doorObj.Bounds.Top)
+                                    isOnGround = true;
+
+
+                                if (IsOnGround)
                                 {
+                                    // Resolve the collision along the Y axis.
+                                    Position = new Vector2(Position.X, Position.Y + depth.Y);
 
-                                    if (previousBottom <= collisionObject.Top)
-                                        isOnGround = true;
-
-
-                                    if (IsOnGround)
-                                    {
-                                        // Resolve the collision along the Y axis.
-                                        Position = new Vector2(Position.X, Position.Y + depth.Y);
-
-                                        bounds = playerBounds;
-                                    }
-                                    else
-                                    {
-                                        Position = new Vector2(Position.X, Position.Y + depth.Y);
-                                    }
-
+                                    bounds = playerBounds;
                                 }
                                 else
                                 {
-                                    Position = new Vector2(Position.X + depth.X, Position.Y);
-
-                                    // Perform further collisions with the new bounds.
-                                    bounds = playerBounds;
+                                    Position = new Vector2(Position.X, Position.Y + depth.Y);
                                 }
+
                             }
-                        }
-                    }
-                }
-                if(kvp.Key == "TeleportObjects")
-                {
-                    foreach (var collisionObject in kvp.Value)
-                    {
-                        bool debounce = false;
-                        if (bounds.Intersects(collisionObject) && debounce == false)
-                        {
-                            debounce = true;
-                            GameStateManager.Instance.LoadEndScreen(timeInLevel, currentLevelName, coinsCollected);
+                            else
+                            {
+                                Position = new Vector2(Position.X + depth.X, Position.Y);
+
+                                // Perform further collisions with the new bounds.
+                                bounds = playerBounds;
+                            }
                         }
                     }
                 }
             }
 
-            
             previousBottom = bounds.Bottom;
-            
+
         }
+
+        private void DoCollisions(Rectangle _playerBounds, Rectangle objectBounds)
+        {
+            Vector2 depth = Physics.RectangleExtensions.GetIntersectionDepth(_playerBounds, objectBounds);
+            if (depth != Vector2.Zero)
+            {
+                float absDepthX = Math.Abs(depth.X);
+                float absDepthY = Math.Abs(depth.Y);
+
+                // Resolve the collision along the shallow axis.
+                if (absDepthY < absDepthX)
+                {
+
+                    if (previousBottom <= objectBounds.Top)
+                        isOnGround = true;
+
+
+                    if (IsOnGround)
+                    {
+                        // Resolve the collision along the Y axis.
+                        Position = new Vector2(Position.X, Position.Y + depth.Y);
+
+                        _playerBounds = playerBounds;
+                    }
+                    else
+                    {
+                        Position = new Vector2(Position.X, Position.Y + depth.Y);
+                    }
+
+                }
+                else
+                {
+                    Position = new Vector2(Position.X + depth.X, Position.Y);
+
+                    // Perform further collisions with the new bounds.
+                    _playerBounds = playerBounds;
+                }
+            }
+        }
+        
+
+        public List<Vector2> GetUnrenderedTileList()
+        {
+            List<Vector2> list = new List<Vector2>();
+            foreach(var obj in mapObjectsToNotRender)
+            {
+                list.AddRange(obj.tileCoordinates);
+            }
+
+            return list;
+        }
+
+        private void HandleDebounce(float elapsed)
+        {
+            if (TeleportCounter >= TeleportCooldown)
+            {
+                TeleportLocked = false;
+                TeleportCounter = 0;
+            }
+            if (TeleportLocked)
+            {
+                TeleportCounter += elapsed;
+            }
+
+
+            if (DoorCounter >= DoorCooldown)
+            {
+                DoorLocked = false;
+                DoorCounter = 0;
+            }
+            if (DoorLocked)
+            {
+                DoorCounter += elapsed;
+            }
+        }
+
+        private MapObject FindObjectFromID(int id, List<MapObject> objects)
+        {
+            foreach(var obj in objects)
+            {
+                if (obj.objectId == id)
+                    return obj;
+            }
+            return null;
+        }
+
 
 
     }

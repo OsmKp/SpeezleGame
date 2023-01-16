@@ -92,13 +92,25 @@ namespace SpeezleGame.Core
                 _screens.Push(screen);
                 // Initialize the screen
 
-                _screens.Peek().Initialize(); 
+                _screens.Peek().Initialize();
+
+                /*Texture2D currentFrameTexture;
+                PauseMenuState converted = screen as PauseMenuState;
+                if (converted != null)
+                {
+                    Debug.WriteLine("CONVERSION SUCCESSFUL");
+                    currentFrameTexture = screenManager.LastFrame;
+                    screen.SetBackgroundTexture(currentFrameTexture);
+                }*/
+                
+
+                
                 
                 // Call the LoadContent on the screen
                 if (Content != null)
                 {
                     _screens.Peek().LoadContent(Content);
-
+                    
                 }
             }
             catch (Exception ex)
@@ -116,6 +128,7 @@ namespace SpeezleGame.Core
                 {
                     var screen = _screens.Peek();
                     _screens.Pop();
+                    _screens.Peek().ReInitialize();
                 }
                 catch (Exception ex)
                 {

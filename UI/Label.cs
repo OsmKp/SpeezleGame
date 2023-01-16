@@ -23,8 +23,8 @@ namespace SpeezleGame.UI
         public Color PenColour { get; set; }
 
         public Vector2 Position { get; set; }
-        private const int horizontalStretch = 4;
-        private const int verticalStretch = 3;
+        public int horizontalStretch = 4;
+        public int verticalStretch = 3;
 
         public string Text { get; set; }
 
@@ -46,11 +46,12 @@ namespace SpeezleGame.UI
 
             if (!string.IsNullOrEmpty(Text))
             {
-                var x = (ButtonDrawSize.X + (ButtonDrawSize.Width / 2) - (_font.MeasureString(Text).X / 2));
+                var x = (ButtonDrawSize.X + (ButtonDrawSize.Width  / 2) - (_font.MeasureString(Text).X / 2));
                 var y = (ButtonDrawSize.Y + (ButtonDrawSize.Height / 2) - (_font.MeasureString(Text).Y / 2) - 2);
 
                 //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
-                spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+                //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+                spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour, 0f, new Vector2(0,0), 1f, SpriteEffects.None, 0.1f);
             }
         }
 

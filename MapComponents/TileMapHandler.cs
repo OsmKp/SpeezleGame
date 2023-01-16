@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiledCS;
 
-namespace SpeezleGame.Physics
+namespace SpeezleGame.MapComponents
 {
     public class TileMapHandler
     {
@@ -48,10 +48,10 @@ namespace SpeezleGame.Physics
 
         }
 
-        public void Draw(SpriteBatch spriteBatch/*,Matrix transformMatrix*/)
+        public void Draw(SpriteBatch spriteBatch/*,Matrix transformMatrix*/, List<Vector2> changedTileSets)
         {
-           
-            
+
+
 
             var tileLayers = map.Layers.Where(x => x.type == TiledLayerType.TileLayer);
 
@@ -80,14 +80,19 @@ namespace SpeezleGame.Physics
                         var tileset = tilesets[mapTileset.firstgid];
 
                         // Use the connection object as well as the tileset to figure out the source rectangle
+                        if (changedTileSets.Contains(new Vector2(tileX, tileY)))
+                        {
+                            gid = 11;
+                        }
+
                         var rect = map.GetSourceRect(mapTileset, tileset, gid);
 
                         // Create destination and source rectangles
                         var source = new Rectangle(rect.x, rect.y, rect.width, rect.height);
                         var destination = new Rectangle(tileX, tileY, map.TileWidth, map.TileHeight);
 
-
                         
+
                         Trans tileTrans = Trans.None;
                         if (map.IsTileFlippedHorizontal(layer, x, y)) tileTrans |= Trans.Flip_H;
                         if (map.IsTileFlippedVertical(layer, x, y)) tileTrans |= Trans.Flip_V;
@@ -133,7 +138,7 @@ namespace SpeezleGame.Physics
                     }
                 }
             }
-            
+
         }
 
 

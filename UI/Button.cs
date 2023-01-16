@@ -24,8 +24,8 @@ namespace SpeezleGame.UI
         private bool isHovering;
 
         private Texture2D _texture;
-        private const int horizontalStretch = 4;
-        private const int verticalStretch = 3;
+        public int horizontalStretch = 4;
+        public int verticalStretch = 3;
 
 
         public event EventHandler Click;

@@ -51,6 +51,11 @@ namespace SpeezleGame.Renderers
         public abstract void Initialize();
         public abstract void Draw(GameTime gameTime);
 
+        public virtual void Draw(GameTime gameTime, List<Vector2> tilesToNotRender)
+        {
+
+        }
+
 
 
     }

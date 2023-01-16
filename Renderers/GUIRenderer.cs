@@ -21,6 +21,11 @@ namespace SpeezleGame.Renderers
         {
 
         }
+        
+        public void UpdateComponent(List<Component> components)
+        {
+            uiComponents = components;
+        }
 
         public void SetComponent(List<Component> components)
         {

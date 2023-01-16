@@ -26,6 +26,7 @@ namespace SpeezleGame.Renderers
 
         public override void Draw(GameTime gameTime)
         {
+            if (entities == null) { return; }
             foreach (var entity in entities)
             {
                 entity.Draw(SpriteBatch, gameTime);

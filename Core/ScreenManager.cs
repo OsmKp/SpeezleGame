@@ -18,7 +18,12 @@ namespace SpeezleGame.Core
         public static int ScreenWidth = 1920; //test
         public static int ScreenHeight = 1080; //test
         
+        public Texture2D LastFrame
+        {
+            get { return _lastFrame; }
+        }
 
+        private Texture2D _lastFrame;
         public int Width
         {
             get { return target.Width; }
@@ -72,6 +77,7 @@ namespace SpeezleGame.Core
 
         public void UnSet()
         {
+            _lastFrame = (Texture2D)target;
             game.GraphicsDevice.SetRenderTarget(null);
             isSet = false;
         }
@@ -114,11 +120,13 @@ namespace SpeezleGame.Core
             Rectangle destinationRectangle = this.CalculateDestinationRectangle();
             Debug.WriteLine("width " + destinationRectangle.Width + "height " + destinationRectangle.Height);
 
-           
+            
 
             game.tileRenderer.Begin(Matrix.Identity, textureFiltering);
             game.tileRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
             game.tileRenderer.End();
+
+            
 
             game.guiRenderer.Begin(Matrix.Identity, textureFiltering);
             game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White);

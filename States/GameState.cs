@@ -66,6 +66,9 @@ namespace SpeezleGame.States
         
         public abstract void UnloadContent(ContentManager content);
         public abstract void Update(GameTime gameTime);
+
+        public virtual void SetBackgroundTexture(Texture2D backgroundTexture) { }
+        public virtual void ReInitialize() { }
         public virtual void DrawEntity(GameTime gameTime) { }
         public virtual void DrawGUI(GameTime gameTime) { }
         public virtual void DrawTile(GameTime gameTime) { }
