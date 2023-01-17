@@ -25,7 +25,12 @@ namespace SpeezleGame.States
     {
 
         Player _player;
-
+        
+        public int LevelTimeInt
+        {
+            get { return (int)Math.Round(levelTime); }
+        }
+        private float levelTime;
         
         private Background _background;
 
@@ -33,16 +38,18 @@ namespace SpeezleGame.States
         private TiledMap map; //
         private Dictionary<int, TiledTileset> tilesets; //
         private Texture2D tilesetTexture; //
+
         private TiledLayer collisionLayer; //
         private TiledLayer teleportLayer;
         private TiledLayer leverLayer;
         private TiledLayer doorLayer;
+        private TiledLayer coinLayer;
+        private TiledLayer endLayer;
 
         private List<Rectangle> RectangleMapObjects;
         private List<MapObject> MapObjects;
 
-        private List<Rectangle> RectangleTeleportObjects;
-        private List<Rectangle> RectangleCollisionObjects;
+
 
         private List<TiledPolygon> PolygonCollisionObjects;
 
@@ -51,6 +58,8 @@ namespace SpeezleGame.States
         Button PauseMenuButton;
         Label DashCooldownLabel;
         Label SlideCooldownLabel;
+        Label LevelTimeLabel;
+        Label CoinDisplayLabel;
 
         List<Component> _components;
         List<BaseEntity> _entities = new List<BaseEntity>();
@@ -60,10 +69,11 @@ namespace SpeezleGame.States
         SpriteFont mainMenuFont;
         Texture2D displayTexture;
         Texture2D pauseMenuTexture;
+        Texture2D coinDisplayTexture;
 
         Camera camera;
 
-        ContentManager contentManager;
+        
 
         public LevelOneState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
             base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer,backgroundRenderer ,game)
@@ -77,7 +87,7 @@ namespace SpeezleGame.States
         }
         public override void LoadContent(ContentManager contentManager)
         {
-            Debug.WriteLine("called load content");
+            
 
             HandleBackgroundInitialization(contentManager);
             backgroundRenderer.SetBackground(_background);
@@ -86,6 +96,7 @@ namespace SpeezleGame.States
             tileRenderer.SetMapHandler(_tileMapHandler);
 
             HandlePlayerInitialization(contentManager);
+            HandleLevelTimeInitialization();
             HandleEnemyInitialization(contentManager);
 
             entityRenderer.SetEntity(_entities);
@@ -123,7 +134,8 @@ namespace SpeezleGame.States
 
 
             HandlePlayerUpdate(gameTime);
-            
+            HandleLevelTime(gameTime);
+
 
             foreach (var entity in _entitiesWoPlayer)
                 entity.Update(gameTime, _player.Position, RectangleMapObjects, PolygonCollisionObjects, MapObjects);
@@ -160,26 +172,25 @@ namespace SpeezleGame.States
 
         public override void DrawGUI(GameTime gameTime)
         {
-            Debug.WriteLine("draw GUI CALLEDLEDLFFED");
+            
             if (_components == null) { return; }
             foreach (Component comp in _components)
             {
                 guiRenderer.Draw(gameTime);
-            }
+            }   
 
         }
-        /*public override void Draw(GameTime gameTime)
+        private void HandleLevelTimeInitialization()
         {
-            //_graphicsDevice.Clear(Color.CornflowerBlue);
-
-
+            levelTime = 0f;
+        }
+        private void HandleLevelTime(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            levelTime += elapsed;
+            LevelTimeLabel.Text = "Time: " + LevelTimeInt;
             
-            DrawUI(spriteBatch);
-
-            _tileMapHandler.Draw(SpriteBatch);
-            _player.Draw(spriteBatch, gameTime, GameStateManager.transformMatrix, spriteHandler);
-
-        }*/
+        }
 
         private void MainMenuButton_Click(object sender, EventArgs e)
         {
@@ -201,6 +212,7 @@ namespace SpeezleGame.States
             displayTexture = contentManager.Load<Texture2D>("Test/DisplayLabel2");
 
             //MainMenu Button
+            coinDisplayTexture = contentManager.Load<Texture2D>("Test/CoinDisplay");
 
 
             PauseMenuButton = new Button(pauseMenuTexture, mainMenuFont)
@@ -209,6 +221,15 @@ namespace SpeezleGame.States
                 Text = "",
                 Layer = 0.1f,
                 horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
+            CoinDisplayLabel = new Label(coinDisplayTexture, mainMenuFont)
+            {
+                Position = new Vector2(500, 0),
+                Text = "  ",
+                Layer = 0.1f,
+                horizontalStretch = 3,
                 verticalStretch = 2,
             };
 
@@ -231,6 +252,15 @@ namespace SpeezleGame.States
 
             };
 
+            LevelTimeLabel = new Label(displayTexture, mainMenuFont)
+            {
+                Position = new Vector2(0, 0),
+                Text = "Time: ",
+                Layer = 0.1f,
+                horizontalStretch = 4,
+                verticalStretch = 3,
+            };
+
             
             PauseMenuButton.Click += PauseMenuButton_Click;
             _components = new List<Component>()
@@ -239,6 +269,8 @@ namespace SpeezleGame.States
                 PauseMenuButton,
                 DashCooldownLabel,
                 SlideCooldownLabel,
+                LevelTimeLabel,
+                CoinDisplayLabel,
             };
         }
 
@@ -250,7 +282,7 @@ namespace SpeezleGame.States
 
         private void HandleEnemyInitialization(ContentManager contentManager)
         {
-            Debug.WriteLine("but player init called");
+            
             Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/Enemy1IdleAnim");
             Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/Enemy1WalkAnim");
 
@@ -262,12 +294,6 @@ namespace SpeezleGame.States
 
             };
 
-            /*EnemyTextureContainer enemyContainer2 = new EnemyTextureContainer()
-            {
-                Idle = idleTexture,
-                Walk = walkTexture,
-
-            };*/
 
             List<Vector2> waypoints1 = new List<Vector2>();
             waypoints1.Add(new Vector2(1340, 750));
@@ -296,7 +322,7 @@ namespace SpeezleGame.States
 
         private void HandlePlayerInitialization(ContentManager contentManager)
         {
-            Debug.WriteLine("but player init called");
+            
             Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/HogRiderIdleAnimPngBetter");
             Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/HogRiderWalkAnimPng-Sheet");
             Texture2D dashTexture = contentManager.Load<Texture2D>("Textures/HogRiderDashAnim");
@@ -320,7 +346,8 @@ namespace SpeezleGame.States
             _player.Update(gameTime, KeyboardState, MouseState,/*PreviousMouseState,*/RectangleMapObjects, PolygonCollisionObjects, MapObjects); //update player every frame //note to myseld: fix polygon collision objects
             DashCooldownLabel.Text = "Dash: " + _player.DashCooldownString;
             SlideCooldownLabel.Text = "Slide: " + _player.SlideCooldownString;
-
+            CoinDisplayLabel.Text = " " + _player.CoinsCollected;
+            _player.timeInLevel = LevelTimeInt;
         }
         private void HandleTileMap(ContentManager contentManager)
         {
@@ -333,6 +360,8 @@ namespace SpeezleGame.States
             teleportLayer = map.Layers.First(l => l.name == "Teleport");
             leverLayer = map.Layers.First(l => l.name == "Lever");
             doorLayer = map.Layers.First(l => l.name == "Door");
+            coinLayer = map.Layers.First(l => l.name == "Coin");
+            endLayer = map.Layers.First(l => l.name == "End");
 
             _tileMapHandler = new TileMapHandler(_graphicsDevice, map, tilesets, tilesetTexture);
 
@@ -363,14 +392,22 @@ namespace SpeezleGame.States
                 MapObjects.Add(new LeverObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height), int.Parse(obj.name)));
             }
 
-            Debug.WriteLine("Managed to finish handletilemap");
+            
 
             foreach (var obj in doorLayer.objects)
             {
                 MapObjects.Add(new DoorObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height)));
             }
 
-            
+            foreach(var obj in coinLayer.objects)
+            {
+                MapObjects.Add(new CoinObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height)));
+            }
+
+            foreach(var obj in endLayer.objects)
+            {
+                MapObjects.Add(new EndObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height), obj.name));
+            }
             
         }
     }

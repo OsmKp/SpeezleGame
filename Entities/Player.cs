@@ -28,12 +28,18 @@ namespace SpeezleGame.Entities.Players
         private const int WALK_ANIM_SPRITE_SIZE = 32;
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
 
-        
+        private GameState currentState;
         private GraphicsDevice graphicsDevice;
 
-        private string currentLevelName;
+        
+
+        public int CoinsCollected
+        {
+            get { return coinsCollected; }
+        }
         private int coinsCollected;
-        private int timeInLevel;
+
+        public int timeInLevel;
 
         private readonly Vector2 gravity = new Vector2(0, 10f);
 
@@ -128,11 +134,11 @@ namespace SpeezleGame.Entities.Players
 
         private List<MapObject> mapObjectsToNotRender = new List<MapObject>();
 
-        private float TeleportCooldown = 10f;
+        private float TeleportCooldown = 50.0f;
         private float TeleportCounter;
         private bool TeleportLocked;
 
-        private float DoorCooldown = 10f;
+        private float DoorCooldown = 50f;
         private float DoorCounter;
         private bool DoorLocked;
 
@@ -148,11 +154,6 @@ namespace SpeezleGame.Entities.Players
 
         public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice) 
         {
-
-            
-
-            
-            
 
 
             //add animations to the player animation container
@@ -270,7 +271,7 @@ namespace SpeezleGame.Entities.Players
 
             if (!isDashLocked)
             {
-                isDashingPressed = keyboardState.IsKeyDown(Keys.LeftShift) || (mouseState.LeftButton == ButtonState.Pressed/* && previousMouseState.LeftButton == ButtonState.Pressed*/);
+                isDashingPressed = keyboardState.IsKeyDown(Keys.LeftShift);
                 if (isDashingPressed)
                 {
                     dashCDTimer = 0;
@@ -282,7 +283,7 @@ namespace SpeezleGame.Entities.Players
 
             if (!isSlidingLocked)
             {
-                isSlidingPressed = keyboardState.IsKeyDown(Keys.C) || (mouseState.RightButton == ButtonState.Pressed/* && previousMouseState.LeftButton == ButtonState.Pressed*/);
+                isSlidingPressed = keyboardState.IsKeyDown(Keys.C);
                 if (isSlidingPressed)
                 {
                     slideCDTimer = 0;
@@ -607,6 +608,8 @@ namespace SpeezleGame.Entities.Players
                     TeleportObject tpObj = mapObject as TeleportObject;
                     LeverObject leverObj = mapObject as LeverObject;
                     DoorObject doorObj = mapObject as DoorObject;
+                    CoinObject coinObj = mapObject as CoinObject;
+                    EndObject endObj = mapObject as EndObject;
                     if (tpObj != null && !TeleportLocked)
                     {
                         TeleportObject destination = FindObjectFromID(tpObj.TargetID, mapObjects) as TeleportObject;
@@ -623,6 +626,16 @@ namespace SpeezleGame.Entities.Players
                         else
                             mapObjectsToNotRender.Add(targetDoor);
 
+                    }
+                    else if(coinObj != null && coinObj.IsCollected == false)
+                    {
+                        coinObj.IsCollected = true;
+                        this.coinsCollected++;
+                        mapObjectsToNotRender.Add(coinObj);
+                    }
+                    else if(endObj != null)
+                    {
+                        GameStateManager.Instance.LoadEndScreen(timeInLevel, endObj.CurrentLevel, CoinsCollected);
                     }
                     else if(doorObj != null && doorObj.IsOpen == false)
                     {
@@ -720,8 +733,9 @@ namespace SpeezleGame.Entities.Players
             return list;
         }
 
-        private void HandleDebounce(float elapsed)
+        private void HandleDebounce(float elapsed )
         {
+            
             if (TeleportCounter >= TeleportCooldown)
             {
                 TeleportLocked = false;

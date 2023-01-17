@@ -28,13 +28,21 @@ namespace SpeezleGame.States
         private List<Component> _components;
         private string levelNameFinished;
         private int timeLevelTook;
+
         private int coinsCollectedInPreviousLevel;
 
         private Background _background;
 
         Texture2D buttonTexture;
-        Texture2D celebrationTexture;
-        SpriteFont celebrationFont;
+        Texture2D labelTexture;
+        Texture2D backFrameTexture;
+        Texture2D frontFrameTexture;
+        Texture2D coinTexture;
+        Texture2D coinCountTexture;
+
+        Label CoinCount;
+
+        SpriteFont generalFont;
         public EndOfLevelState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game)
         {
         }
@@ -66,12 +74,12 @@ namespace SpeezleGame.States
             levelNameFinished = _levelNameFinished;
             timeLevelTook = _timeLevelTook;
             coinsCollectedInPreviousLevel = _coinsCollected;
-            Debug.WriteLine("correct thing run i think");
+            CoinCount.Text = coinsCollectedInPreviousLevel.ToString();
         }
 
         public override void LoadContent(ContentManager content)
         {
-            Debug.WriteLine("end of level init??");
+            
 
             HandleBackgroundInitialization(content);
             backgroundRenderer.SetBackground(_background);
@@ -94,50 +102,113 @@ namespace SpeezleGame.States
                 
                 component.Update(gameTime);
             }
+
+
         }
         private void HandleBackgroundInitialization(ContentManager contentManager)
         {
-            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/CloudBackground");
+            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/EndBackground");
             _background = new Background(backgroundTexture);
         }
 
         private void HandleUIInitialization(ContentManager contentManager)
         {
-            buttonTexture = contentManager.Load<Texture2D>("Test/GreyButton");
-            celebrationTexture = contentManager.Load<Texture2D>("Test/WhiteLabel");
-            celebrationFont = contentManager.Load<SpriteFont>("Test/generalFont");
+            labelTexture = contentManager.Load<Texture2D>("Test/EndLabel");
+            buttonTexture = contentManager.Load<Texture2D>("Test/EndButton");
+            backFrameTexture = contentManager.Load<Texture2D>("Test/EndBackFrame");
+            frontFrameTexture = contentManager.Load<Texture2D>("Test/EndFrontFrame");
+            coinTexture = contentManager.Load<Texture2D>("Test/coinpng");
+            coinCountTexture = contentManager.Load<Texture2D>("Test/trans");
+            generalFont = contentManager.Load<SpriteFont>("Test/generalFont");
+            
 
-            //Congrats Label
-            Label Celebration = new Label(celebrationTexture, celebrationFont)
+            //Backframe Label
+            Label BackFrame = new Label(backFrameTexture, generalFont)
             {
-                Position = new Vector2(300, 150),
-                Text = "Congrats",
-                Layer = 0.1f,
+                Position = new Vector2(176, 64),
+                Text = "",
+                Layer = 0.3f,
+                horizontalStretch = 3,
+                verticalStretch = 3,
+
             };
-            //Congrats Button End
+            //Backframe Label End
+
+            Label FrontFrame = new Label(frontFrameTexture, generalFont)
+            {
+                Position = new Vector2(200, 108),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 5,
+                verticalStretch = 4,
+            };
+
+            Label CoinImage = new Label(coinTexture, generalFont)
+            {
+                Position = new Vector2(220, 124),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
+            CoinCount = new Label(coinCountTexture, generalFont)
+            {
+                Position = new Vector2(248, 124),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
+            Button Next = new Button(buttonTexture, generalFont)
+            {
+                Position = new Vector2(416, 232),
+                Text = "Next",
+                Layer = 0.2f,
+                
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+            Button Replay = new Button(buttonTexture, generalFont)
+            {
+                Position = new Vector2(156, 232),
+                Text = "Replay",
+                Layer = 0.2f,
+                
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
 
             //Quit Button
-            Button Quit = new Button(buttonTexture, celebrationFont)
+            Button Menu = new Button(buttonTexture, generalFont)
             {
-                Position = new Vector2(0, 150),
-                Text = "Quit",
+                Position = new Vector2(288, 232),
+                Text = "Menu",
                 Layer = 0.2f,
+                
+                horizontalStretch = 2,
+                verticalStretch = 2,
             };
 
-            Quit.Click += Quit_Click;
+            Menu.Click += Menu_Click;
             //Quit Button End
 
             _components = new List<Component>()
             {
-                
-                Celebration,
-                Quit,
+                BackFrame,
+                FrontFrame,
+                Next,
+                Replay,
+                CoinImage,
+                CoinCount,
+                Menu,
             };
 
 
         }
 
-        private void Quit_Click(object sender, EventArgs e)
+        private void Menu_Click(object sender, EventArgs e)
         {
             //_speezleGame.Exit();
             game.Exit();

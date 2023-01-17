@@ -85,7 +85,7 @@ namespace SpeezleGame.States
 
         private void HandleBackgroundInitialization(ContentManager contentManager)
         {
-            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/LevelBackground3");
+            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/MenuBackground");
             _background = new Background(backgroundTexture);
         }
         private void HandleUIInitialization(ContentManager contentManager)

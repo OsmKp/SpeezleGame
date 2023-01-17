@@ -39,7 +39,7 @@ namespace SpeezleGame.States
 
         public override void DrawGUI(GameTime gameTime)
         {
-            Debug.WriteLine("PAUSE MENU DRAWWWWWWW");
+            
             if (_components == null) { return; }
             foreach (Component comp in _components)
             {
@@ -64,7 +64,7 @@ namespace SpeezleGame.States
         }*/
         public override void LoadContent(ContentManager content)
         {
-            Debug.WriteLine("end of level init??");
+            
 
             HandleBackgroundInitialization(content);
             backgroundRenderer.SetBackground(_background);
@@ -91,7 +91,7 @@ namespace SpeezleGame.States
 
         private void HandleBackgroundInitialization(ContentManager contentManager)
         {
-            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Textures/LevelBackground");
+            Texture2D backgroundTexture = contentManager.Load<Texture2D>("Test/PauseBackground");
             _background = new Background(backgroundTexture);
         }
 
