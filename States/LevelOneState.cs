@@ -54,12 +54,14 @@ namespace SpeezleGame.States
         private List<TiledPolygon> PolygonCollisionObjects;
 
 
-        Button MainMenuButton;
+        
         Button PauseMenuButton;
         Label DashCooldownLabel;
         Label SlideCooldownLabel;
         Label LevelTimeLabel;
         Label CoinDisplayLabel;
+        Label PlayerHealthLabel;
+        Label PlayerHealthBackLabel;
 
         List<Component> _components;
         List<BaseEntity> _entities = new List<BaseEntity>();
@@ -70,6 +72,9 @@ namespace SpeezleGame.States
         Texture2D displayTexture;
         Texture2D pauseMenuTexture;
         Texture2D coinDisplayTexture;
+
+        Texture2D healthBarTexture;
+        Texture2D healthBackTexture;
 
         Camera camera;
 
@@ -138,7 +143,7 @@ namespace SpeezleGame.States
 
 
             foreach (var entity in _entitiesWoPlayer)
-                entity.Update(gameTime, _player.Position, RectangleMapObjects, PolygonCollisionObjects, MapObjects);
+                entity.Update(gameTime, _player.Position, RectangleMapObjects, PolygonCollisionObjects, MapObjects, _player);
 
             GameStateManager.UpdateCamera(camera.TransformMatrix);
             camera.Follow();
@@ -214,6 +219,8 @@ namespace SpeezleGame.States
             //MainMenu Button
             coinDisplayTexture = contentManager.Load<Texture2D>("Test/CoinDisplay");
 
+            healthBarTexture = contentManager.Load<Texture2D>("Test/HealthBar");
+            healthBackTexture = contentManager.Load<Texture2D>("Test/HealthBack");
 
             PauseMenuButton = new Button(pauseMenuTexture, mainMenuFont)
             {
@@ -231,6 +238,24 @@ namespace SpeezleGame.States
                 Layer = 0.1f,
                 horizontalStretch = 3,
                 verticalStretch = 2,
+            };
+
+            PlayerHealthLabel = new Label(healthBarTexture, mainMenuFont)
+            {
+                Position = new Vector2(362, 10),
+                Text = " ",
+                Layer = 0.1f,
+                horizontalStretch = 7,
+                verticalStretch = 1,
+            };
+
+            PlayerHealthBackLabel = new Label(healthBackTexture, mainMenuFont)
+            {
+                Position = new Vector2(350, -5),
+                Text = " ",
+                Layer = 0.2f,
+                horizontalStretch = 4,
+                verticalStretch = 3,
             };
 
             DashCooldownLabel = new Label(displayTexture, mainMenuFont)
@@ -271,6 +296,9 @@ namespace SpeezleGame.States
                 SlideCooldownLabel,
                 LevelTimeLabel,
                 CoinDisplayLabel,
+                PlayerHealthBackLabel,
+                PlayerHealthLabel,
+                
             };
         }
 
@@ -348,6 +376,32 @@ namespace SpeezleGame.States
             SlideCooldownLabel.Text = "Slide: " + _player.SlideCooldownString;
             CoinDisplayLabel.Text = " " + _player.CoinsCollected;
             _player.timeInLevel = LevelTimeInt;
+
+
+            
+
+            float textureMulti = ((float)_player.Health / (float)_player.MaxHealth);
+            int emptyCells = 6;
+            int initialCells = 16;
+
+            
+            int newPixels = (int)Math.Round(textureMulti * initialCells);
+            int amountToShift = initialCells - newPixels;
+
+            Debug.WriteLine("AMOUNT TO SHIFT: " + amountToShift);
+            Debug.WriteLine("NEW PIXELS: " + newPixels);
+
+            PlayerHealthLabel.sourceRect = new Rectangle(amountToShift, 0, 32-amountToShift, 16);
+
+            
+
+
+
+
+
+
+            
+
         }
         private void HandleTileMap(ContentManager contentManager)
         {

@@ -46,6 +46,9 @@ namespace SpeezleGame.Entities.Players
         public bool IsAlive { get { return isAlive; } }
         bool isAlive = true;
 
+        public int MaxHealth = 100;
+
+
         private bool posInitialized;
 
         public Vector2 Position
@@ -155,6 +158,7 @@ namespace SpeezleGame.Entities.Players
         public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice) 
         {
 
+            Health = MaxHealth;   
 
             //add animations to the player animation container
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Idle),
@@ -203,7 +207,13 @@ namespace SpeezleGame.Entities.Players
                 posInitialized = true;
                 Position = new Vector2(40, 750);
             }
-            
+
+            CheckHealth();
+
+            if (!IsAlive)
+            {
+                //do stuff (bring death screen etc)
+            }
 
             GetInput(keyboardState, mouseState/*, previousMouseState*/ ); //first get what keys are pressed each frame
 
@@ -301,6 +311,7 @@ namespace SpeezleGame.Entities.Players
         public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
         {
 
+            
 
 
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -340,6 +351,15 @@ namespace SpeezleGame.Entities.Players
 
             if (Position.Y == previousPosition.Y)
             { velocity.Y = 0; }
+
+        }
+        private void CheckHealth()
+        {
+            if(Health <= 0)
+            {
+                isAlive = false;
+                Health = 0;
+            }
 
         }
 

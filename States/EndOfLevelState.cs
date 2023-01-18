@@ -25,6 +25,12 @@ namespace SpeezleGame.States
 {
     public class EndOfLevelState : GameState
     {
+        private const int ThreeStarTime = 30;
+        private const int TwoStarTime = 50;
+        private const int OneStarTime = 70;
+
+        private int StarsAchieved;
+
         private List<Component> _components;
         private string levelNameFinished;
         private int timeLevelTook;
@@ -39,8 +45,17 @@ namespace SpeezleGame.States
         Texture2D frontFrameTexture;
         Texture2D coinTexture;
         Texture2D coinCountTexture;
+        Texture2D starTexture;
+        Texture2D clockTexture;
+        Texture2D clockCountTexture;
 
+        Label ClockCount;
         Label CoinCount;
+        Label Star1;
+        Label Star2;
+        Label Star3;
+        Label Celebration;
+        Label LevelMessage;
 
         SpriteFont generalFont;
         public EndOfLevelState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game)
@@ -75,6 +90,35 @@ namespace SpeezleGame.States
             timeLevelTook = _timeLevelTook;
             coinsCollectedInPreviousLevel = _coinsCollected;
             CoinCount.Text = coinsCollectedInPreviousLevel.ToString();
+            ClockCount.Text = _timeLevelTook.ToString() + " Sec";
+            CalculateStar(_timeLevelTook);
+            Celebration.Text = "You Achieved " + StarsAchieved + " Stars!";
+            LevelMessage.Text = "Level " + _levelNameFinished + " Cleared!";
+        }
+
+        private void CalculateStar(int time)
+        {
+            if (time < ThreeStarTime)
+            {
+                StarsAchieved = 3;
+                _components.Add(Star1);
+                _components.Add(Star2);
+                _components.Add(Star3);
+            }
+            else if(time < TwoStarTime)
+            {
+                StarsAchieved = 2;
+                _components.Add(Star1);
+                _components.Add(Star2);
+            }
+            else if(time < OneStarTime)
+            {
+                StarsAchieved = 1;
+                _components.Add(Star1);
+                
+
+            }
+            else { StarsAchieved = 0; }
         }
 
         public override void LoadContent(ContentManager content)
@@ -119,7 +163,12 @@ namespace SpeezleGame.States
             frontFrameTexture = contentManager.Load<Texture2D>("Test/EndFrontFrame");
             coinTexture = contentManager.Load<Texture2D>("Test/coinpng");
             coinCountTexture = contentManager.Load<Texture2D>("Test/trans");
+            clockCountTexture = contentManager.Load<Texture2D>("Test/trans");
+            starTexture = contentManager.Load<Texture2D>("Test/Star");
+            clockTexture = contentManager.Load<Texture2D>("Test/clock");
+
             generalFont = contentManager.Load<SpriteFont>("Test/generalFont");
+            
             
 
             //Backframe Label
@@ -133,10 +182,18 @@ namespace SpeezleGame.States
 
             };
             //Backframe Label End
-
-            Label FrontFrame = new Label(frontFrameTexture, generalFont)
+            LevelMessage = new Label(coinCountTexture, generalFont)
             {
-                Position = new Vector2(200, 108),
+                Position = new Vector2(288, 180),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 5,
+                verticalStretch = 4,
+            };
+
+            Celebration = new Label(coinCountTexture, generalFont)
+            {
+                Position = new Vector2(288, 72),
                 Text = "",
                 Layer = 0.2f,
                 horizontalStretch = 5,
@@ -161,30 +218,80 @@ namespace SpeezleGame.States
                 verticalStretch = 2,
             };
 
+            Label ClockImage = new Label(clockTexture, generalFont)
+            {
+                Position = new Vector2(220, 164),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
+            ClockCount = new Label(clockCountTexture, generalFont)
+            {
+                Position = new Vector2(258, 164),
+                Text = "",
+                Layer = 0.2f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
+
+            Star1 = new Label(starTexture, generalFont)
+            {
+                Position = new Vector2(284, 55),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+
+            };
+
+            Star2 = new Label(starTexture, generalFont)
+            {
+                Position = new Vector2(304, 50),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+
+            };
+
+            Star3 = new Label(starTexture, generalFont)
+            {
+                Position = new Vector2(324, 55),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+
+            };
+
             Button Next = new Button(buttonTexture, generalFont)
             {
                 Position = new Vector2(416, 232),
                 Text = "Next",
                 Layer = 0.2f,
-                
                 horizontalStretch = 2,
                 verticalStretch = 2,
             };
+
             Button Replay = new Button(buttonTexture, generalFont)
             {
                 Position = new Vector2(156, 232),
                 Text = "Replay",
                 Layer = 0.2f,
-                
                 horizontalStretch = 2,
                 verticalStretch = 2,
             };
+
+            Replay.Click += Replay_Click;
 
             //Quit Button
             Button Menu = new Button(buttonTexture, generalFont)
             {
                 Position = new Vector2(288, 232),
-                Text = "Menu",
+                Text = "Levels",
                 Layer = 0.2f,
                 
                 horizontalStretch = 2,
@@ -197,21 +304,29 @@ namespace SpeezleGame.States
             _components = new List<Component>()
             {
                 BackFrame,
-                FrontFrame,
                 Next,
                 Replay,
                 CoinImage,
                 CoinCount,
+                ClockImage,
+                ClockCount,
                 Menu,
+                Celebration,
+                LevelMessage,
             };
 
 
         }
 
+        private void Replay_Click(object sender, EventArgs e)
+        {
+            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+        }
+
         private void Menu_Click(object sender, EventArgs e)
         {
             //_speezleGame.Exit();
-            game.Exit();
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
         }
     }
 }

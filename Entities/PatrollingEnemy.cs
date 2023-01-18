@@ -40,6 +40,11 @@ namespace SpeezleGame.Entities
 
         public bool IsAlive { get { return isAlive; } }
         bool isAlive = true;
+
+        private int Damage = 20;
+        private const float DamageCooldown = 3;
+        private float DamageCooldownCounter;
+        private bool isDamageLocked;
         public bool IsOnGround
         {
             get { return isOnGround; }
@@ -86,6 +91,7 @@ namespace SpeezleGame.Entities
         private const float JumpControlPower = 0.14f;
         public PatrollingEnemy(EnemyTextureContainer enemyTextureContainer, float groundDragFactor, List<Vector2> _waypoints)
         {
+            this.Health = 150;
             GroundDragFactor = groundDragFactor;
 
             _renderingStateMachine.AddState(nameof(EnemyTextureContainer.Idle),
@@ -154,11 +160,11 @@ namespace SpeezleGame.Entities
 
         }
 
-        public override void Update(GameTime gameTime, Vector2 playerPos ,List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
+        public override void Update(GameTime gameTime, Vector2 playerPos ,List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, Player player)
         {
             CalculateMovement(playerPos);
 
-            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects,mapObjects);
+            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects,mapObjects, player);
 
             if (IsAlive)
             {
@@ -211,10 +217,21 @@ namespace SpeezleGame.Entities
             return velocityY;
         }
 
-        public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
+        public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, Player player)
         {
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             previousPosition = Position;
+            //damage cooldown
+            if(DamageCooldownCounter >= DamageCooldown)
+            {
+                DamageCooldownCounter = 0f;
+                isDamageLocked = false;
+            }
+            if (isDamageLocked)
+            {
+                DamageCooldownCounter += elapsed;
+            }
+            //--------------
 
             Debug.WriteLine("movement is: " + movement);
             velocity.X += movement * MoveAcceleration * elapsed;
@@ -233,7 +250,7 @@ namespace SpeezleGame.Entities
             Position += velocity * elapsed; //change the position by using the velocity
             Position = new Vector2((float)Math.Round(Position.X), (float)Math.Round(Position.Y));
 
-            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(),mapObjects, elapsed);
+            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(),mapObjects, elapsed,  player);
 
             if (Position.X == previousPosition.X)
             { velocity.X = 0; }
@@ -243,15 +260,21 @@ namespace SpeezleGame.Entities
 
 
         }
-        private void HandleCollisions( List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, float elapsed)
+        private void HandleCollisions( List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, float elapsed, Player player)
         {
-            HandleRectangleRectangleCollisions(RectangleMapObjects,mapObjects); //handle collisions with rectangle objects
+            HandleRectangleRectangleCollisions(RectangleMapObjects,mapObjects, player); //handle collisions with rectangle objects
         }
 
-        private void HandleRectangleRectangleCollisions(List<Rectangle> RectangleMapObjects, List<MapObject> mapObjects)
+        private void HandleRectangleRectangleCollisions(List<Rectangle> RectangleMapObjects, List<MapObject> mapObjects, Player player)
         {
             Rectangle bounds = enemyBounds;
             isOnGround = false;
+
+            if (bounds.Intersects(player.playerBounds) && !isDamageLocked)
+            {
+                player.Health -= this.Damage;
+                isDamageLocked = true;
+            }
 
             foreach (var collisionObject in RectangleMapObjects)
             {

@@ -133,7 +133,7 @@ namespace SpeezleGame.States
         {
             //load the next state
             
-            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer,tileRenderer, backgroundRenderer,game));
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer,tileRenderer, backgroundRenderer,game));
         }
 
     }

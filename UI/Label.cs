@@ -19,6 +19,7 @@ namespace SpeezleGame.UI
 
         private Texture2D _texture;
 
+        public Rectangle? sourceRect;
         public float Layer { get; set; }
         public Color PenColour { get; set; }
 
@@ -35,14 +36,14 @@ namespace SpeezleGame.UI
 
             PenColour = Color.White;
         }
-        private Rectangle ButtonDrawSize
+        public Rectangle ButtonDrawSize
         {
             get { return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width * horizontalStretch, _texture.Height * verticalStretch); }
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, ButtonDrawSize, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
+            spriteBatch.Draw(_texture, ButtonDrawSize, sourceRect, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
 
             if (!string.IsNullOrEmpty(Text))
             {

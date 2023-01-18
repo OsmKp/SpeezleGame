@@ -116,7 +116,7 @@ namespace SpeezleGame.States
             Button Quit = new Button(buttonTexture, generalFont)
             {
                 Position = new Vector2(256, 205),
-                Text = "Quit",
+                Text = "Levels",
                 Layer = 0.2f,
             };
 
@@ -158,7 +158,7 @@ namespace SpeezleGame.States
         private void Quit_Click(object sender, EventArgs e)
         {
 
-            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
             
             
         }
