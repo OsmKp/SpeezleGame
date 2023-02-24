@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Audio;
 using SpeezleGame.States;
 using SpeezleGame.Entities.Players;
 using SpeezleGame.MapComponents;
+using SpeezleGame.AI;
 
 namespace SpeezleGame.Entities
 {
@@ -25,7 +26,10 @@ namespace SpeezleGame.Entities
     {
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
         private bool chasingPlayer;
+        private float XDistanceToJumPoint;
+
         private List<Vector2> waypoints;
+        private List<JumpTrigger> jumpPoints;
         private int currentWaypointIndex = 0;
 
         private float previousBottom;
@@ -67,8 +71,24 @@ namespace SpeezleGame.Entities
         }
         Vector2 velocity;
 
+        //pathfinding
+        private Node startNode;
+        private Node endNode;
+        private List<Node> openList;
+        private List<Node> closedList;
+        private List<Node> path;
+        private int[,] map;
+        private int mapWidth;
+        private int mapHeight;
+
+
+
+
+
+        private string targetName = "player";
+        private Vector2 targetLocation;
         private float movement;
-        private float lastMovement;
+        
 
         //horizontal movement constants
         private const float MoveAcceleration = 4000.0f;
@@ -78,6 +98,7 @@ namespace SpeezleGame.Entities
 
         private const float GravityAcceleration = 2400.0f;
         private const float MaxFallSpeed = 300.0f;
+        private float lastMovement;
 
 
         private bool isJumping;
@@ -89,10 +110,12 @@ namespace SpeezleGame.Entities
         private const float MaxJumpTime = 0.35f;
         private const float JumpLaunchVelocity = -2400.0f;
         private const float JumpControlPower = 0.14f;
-        public PatrollingEnemy(EnemyTextureContainer enemyTextureContainer, float groundDragFactor, List<Vector2> _waypoints)
+        public PatrollingEnemy(EnemyTextureContainer enemyTextureContainer, float groundDragFactor, List<Vector2> _waypoints, List<JumpTrigger> jumpPoints)
         {
             this.Health = 150;
             GroundDragFactor = groundDragFactor;
+
+            this.jumpPoints = jumpPoints;
 
             _renderingStateMachine.AddState(nameof(EnemyTextureContainer.Idle),
                 new SpriteAnimation(enemyTextureContainer.Idle, 1, 16, 32));
@@ -105,38 +128,245 @@ namespace SpeezleGame.Entities
 
             this.Position = new Vector2(waypoints[0].X, waypoints[0].Y);
         }
-        public void CalculateMovement(Vector2 playerPos)
+
+        private void PickTarget(Vector2 playerPos) 
+        {
+            if(targetName == "jump") //if the enemy is going to the jump point allow it to get away from the player.
+            {
+                if (Math.Abs(Position.X - playerPos.X) < XDistanceToJumPoint * 2 && Position.Y - playerPos.Y > 5) //if player is above the enemy
+                {
+                    targetName = "jump";
+                }
+                else
+                {
+                    targetName = "player";
+                }
+            }
+            else
+            {
+                if (Math.Abs(Position.X - playerPos.X) < 2f && Position.Y - playerPos.Y > 5) //if their X coordinate is the same but the enemy is standing under the player
+                {
+                    targetName = "jump";
+                }
+                else
+                {
+                    targetName = "player";
+                }
+            }
+
+
+        }
+
+        private void FindNearestJumpPoint() //finding the nearest jump trigger point to be able to jump up 
+        {
+            float closestDist = 9999;
+
+            foreach (var obj in jumpPoints)
+            {
+                Vector2 objPos = new Vector2(obj.Bounds.X, obj.Bounds.Y);
+                float distX = Math.Abs(objPos.X - Position.X);
+                float distY = Math.Abs(objPos.Y - Position.Y);
+                if (distX < closestDist && distY < 5f)
+                {
+                    closestDist = distX;
+                    targetLocation = objPos + new Vector2(movement * 3, 0);
+                    XDistanceToJumPoint = distX;
+                }
+
+            }
+        }
+
+        /*public void DoAStar(Vector2 playerPosition)
+        {
+            // Set the start and end nodes
+            startNode = new Node { Position = this.Position };
+            endNode = new Node { Position = playerPosition };
+
+
+            // Initialize the open and closed lists
+            openList = new List<Node>();
+            closedList = new List<Node>();
+
+            // Add the start node to the open list
+            openList.Add(startNode);
+
+            while (openList.Count > 0)
+            {
+                // Get the node with the lowest cost from the open list
+                Node currentNode = openList[0];
+                for (int i = 1; i < openList.Count; i++)
+                {
+                    if (openList[i].Cost < currentNode.Cost)
+                    {
+                        currentNode = openList[i];
+                    }
+                }
+
+                // Remove the current node from the open list and add it to the closed list
+                openList.Remove(currentNode);
+                closedList.Add(currentNode);
+
+                // If the current node is the end node, we have found a path
+                if (currentNode == endNode)
+                {
+                    BuildPath(currentNode);
+                    break;
+                }
+
+            }
+
+        }*/
+            
+        public void CalculateMovement(Vector2 playerPos) //This function allows the enemy to chase the player and adds a level of pathfinding to it
         {
             float distanceToPlayer = (playerPos - Position).Length();
-            if(distanceToPlayer < 100) 
-            { 
-                chasingPlayer = true; 
+            if (distanceToPlayer < 500)
+            {
+                chasingPlayer = true;
+                Debug.WriteLine("TARGET IS: " + targetName);
             }
-            else { chasingPlayer = false; }
-            
+            else { chasingPlayer = false; targetName = "player"; }
+
             if (chasingPlayer)
             {
-                var direction = playerPos - this.Position;
-                if (direction.X > 0) { movement = 1f; }
-                else { movement = -1f; }
-            }
-
-            else if (!chasingPlayer)
-            {
-
-
-                var direction = waypoints[currentWaypointIndex] - this.Position;
-
-                if (direction.X > 0) { movement = 1f; }
-                else { movement = -1f; }
-
-                if(Math.Abs(direction.X) < 4)
+                PickTarget(playerPos);
+                if (targetName == "player")
                 {
-                    currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count();
-                }
-                
+                    if (Math.Abs(playerPos.Y - Position.Y) < 2f)
+                    {
+                        targetLocation = playerPos;
+                        Debug.WriteLine("NORMAL CHASE");
+                    }
+                    else if ((playerPos.Y - Position.Y) > 2f && Math.Abs(playerPos.X - Position.X) < 20) //right underneath the player
+                    {
+                        targetLocation = new Vector2(Position.X - 20, Position.Y);
+                        Debug.WriteLine("RIGHT UNDER THE PLAYER");
+                    }
+                    else
+                    {
+                        targetLocation = playerPos;
+                        
+                    }
+                    
 
-                
+                    if (targetName == "jump")
+                    {
+                        FindNearestJumpPoint();
+                    }
+
+                    //Code below moves the enemy in the correct direction depending on where its target is
+                    var direction = targetLocation - this.Position;
+                    if (direction.X > 0)
+                    {
+                        movement = 1f;
+                    }
+                    else if (direction.Y == 0 && direction.X == 0)
+                    {
+                        movement = 0f;
+                        targetName = "player";
+                    }
+                    else { movement = -1f; }
+                }
+                else
+                {
+                    var direction = waypoints[currentWaypointIndex] - this.Position;
+
+                    if (direction.X > 0) { movement = 1f; }
+                    else { movement = -1f; }
+
+                    if (Math.Abs(direction.X) < 4)
+                    {
+                        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count();
+                    }
+                }
+
+
+
+
+                /*float distanceToPlayer = (playerPos - Position).Length();
+                if(distanceToPlayer < 500) 
+                { 
+                    chasingPlayer = true;
+                    Debug.WriteLine("TARGET IS: " + targetName);
+                }
+                else { chasingPlayer = false; targetName = "player"; }
+
+                if(playerPos.Y <= Position.Y)
+                {
+                    targetName = "player";
+                }
+
+                if (chasingPlayer && targetName == "player")
+                {
+                    var direction = playerPos - this.Position;
+                    if (direction.X > 0 && Math.Abs(direction.Y) !=  0)
+                    {
+                        movement = 1f;
+                    }
+                    else if (direction.Y == 0 && direction.X == 0)
+                    {
+
+                        movement = 0f;
+                    }
+                    else if (direction.Y < 0 && direction.X == 0)
+                    {
+                        targetName = "jump";
+                        float closestDist = 9999;
+
+                        foreach (var obj in jumpPoints)
+                        {
+                            Vector2 objPos = new Vector2(obj.Bounds.X, obj.Bounds.Y);
+                            float dist = (objPos - Position).Length();
+                            if (dist < closestDist)
+                            {
+                                closestDist = dist;
+                                targetLocation = objPos;
+                            }
+
+                        }
+                    }
+
+
+
+
+                    else { movement = -1f; }
+
+
+                }
+
+                else if (chasingPlayer && targetName == "jump")
+                {
+                    var direction = targetLocation - this.Position;
+                    if (direction.X > 0)
+                    {
+                        movement = 1f;
+                    }
+                    else if (direction.Y == 0 && direction.X == 0)
+                    {
+
+                        targetName = "player";
+                    }
+                    else { movement = -1f; }
+
+                }
+
+                else if (!chasingPlayer)
+                {
+
+
+                    var direction = waypoints[currentWaypointIndex] - this.Position;
+
+                    if (direction.X > 0) { movement = 1f; }
+                    else { movement = -1f; }
+
+                    if(Math.Abs(direction.X) < 4)
+                    {
+                        currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Count();
+                    }
+
+
+
+                }*/
             }
         }
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -233,14 +463,14 @@ namespace SpeezleGame.Entities
             }
             //--------------
 
-            Debug.WriteLine("movement is: " + movement);
+            
             velocity.X += movement * MoveAcceleration * elapsed;
             velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
 
             velocity.Y = DoJump(velocity.Y, gameTime);
 
-            Debug.WriteLine("enemy x vel is: " + Velocity.X);
-            if (IsOnGround) //if the player is on the ground apply resistive forces
+            
+            if (IsOnGround) //if the enemy is on the ground apply resistive forces
             { velocity.X *= GroundDragFactor; }
             else
             { velocity.X *= AirDragFactor; }
@@ -320,6 +550,33 @@ namespace SpeezleGame.Entities
                     }
                 }
                     
+            }
+            
+
+            foreach (var mapObject in mapObjects)
+            {
+                
+
+                if (bounds.Intersects(mapObject.Bounds))
+                {
+                    JumpTrigger jumpObj = mapObject as JumpTrigger;
+
+                    //if enemy collides with a jump trigger then make a decision
+                    
+
+                    if (jumpObj != null)
+                    {
+
+                        var direction = player.Position - this.Position;
+                        if(direction.Y < 0 && !isJumping)
+                        {
+
+                            isJumping = true; 
+
+                        }
+                    }
+                    
+                }
             }
 
 

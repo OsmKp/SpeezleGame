@@ -24,8 +24,9 @@ namespace SpeezleGame.Entities.Players
 
     public class Player : BaseEntity
     {
-        private const int WALK_ANIM_SPRITE_COUNT = 4;
-        private const int WALK_ANIM_SPRITE_SIZE = 32;
+        private const int WALK_ANIM_SPRITE_COUNT = 2;
+        private const int WALK_ANIM_SPRITE_SIZE_HEIGHT = 32;
+        private const int WALK_ANIM_SPRITE_SIZE_WIDTH = 16;
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
 
         private GameState currentState;
@@ -131,11 +132,13 @@ namespace SpeezleGame.Entities.Players
             get
             {
                 
-                return new Rectangle((int)Position.X + 2, (int)Position.Y  , 28, 33);
+                return new Rectangle((int)Position.X + 2, (int)Position.Y  , 14, 33);
             }
         }
+        private Vector2 StartCoords;
 
         private List<MapObject> mapObjectsToNotRender = new List<MapObject>();
+        private List<MapObject> mapObjectsToChange = new List<MapObject>();
 
         private float TeleportCooldown = 50.0f;
         private float TeleportCounter;
@@ -155,45 +158,45 @@ namespace SpeezleGame.Entities.Players
 
 
 
-        public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice) 
+        public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice, Vector2 startPos) 
         {
 
-            Health = MaxHealth;   
-
+            Health = MaxHealth;
+            StartCoords = startPos;
             //add animations to the player animation container
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Idle),
-                new SpriteAnimation(container.Idle, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Idle, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Walk),
-                new SpriteAnimation(container.Walk, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Walk, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Dash),
-                new SpriteAnimation(container.Dash, 1, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Dash, 1, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Slide),
-                new SpriteAnimation(container.Slide, 1, WALK_ANIM_SPRITE_SIZE, WALK_ANIM_SPRITE_SIZE));
+                new SpriteAnimation(container.Slide, 1, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
 
             _renderingStateMachine.SetState(nameof(PlayerTextureContainer.Idle)); //set the initial state to idle
             _renderingStateMachine.CurrentState.Animation.Play();
         }
 
-        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime/*, Matrix transformMatrix, SpriteHandler spriteHandler*/)
+        public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             SpriteEffects flip = SpriteEffects.None;
             
             //get which direction the player is facing and flip animations accordingly
             if (Velocity.X < 0)
-                flip = SpriteEffects.None;
+                flip = SpriteEffects.FlipHorizontally;
             else if (Velocity.X > 0)
-                flip = SpriteEffects.FlipHorizontally;
-            else if (lastMovement == -1.0f)
                 flip = SpriteEffects.None;
-            else if (lastMovement == 1.0f)
+            else if (lastMovement == -1.0f)
                 flip = SpriteEffects.FlipHorizontally;
+            else if (lastMovement == 1.0f)
+                flip = SpriteEffects.None;
 
             //draw player
             
 
-            //spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
+            
             _renderingStateMachine.Draw(spriteBatch, Position, flip);
-            //spriteBatch.End();
+            
         }
         public override void Update(GameTime gameTime)
         {
@@ -205,7 +208,7 @@ namespace SpeezleGame.Entities.Players
             if (!posInitialized)
             {
                 posInitialized = true;
-                Position = new Vector2(40, 750);
+                Position = StartCoords;
             }
 
             CheckHealth();
@@ -215,7 +218,7 @@ namespace SpeezleGame.Entities.Players
                 //do stuff (bring death screen etc)
             }
 
-            GetInput(keyboardState, mouseState/*, previousMouseState*/ ); //first get what keys are pressed each frame
+            GetInput(keyboardState, mouseState ); //first get what keys are pressed each frame
 
             ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects, mapObjects); //apply physics and process key presses
 
@@ -260,7 +263,7 @@ namespace SpeezleGame.Entities.Players
 
 
         //get key inputs
-        private void GetInput(KeyboardState keyboardState, MouseState mouseState/* MouseState previousMouseState*/)
+        private void GetInput(KeyboardState keyboardState, MouseState mouseState)
         {
             if (keyboardState.IsKeyDown(Keys.A))
             {
@@ -286,7 +289,7 @@ namespace SpeezleGame.Entities.Players
                 {
                     dashCDTimer = 0;
                     isDashLocked = true;
-                    //isDashingReleased = false;
+                    
                     isDashing = true;
                 }
             }
@@ -298,7 +301,7 @@ namespace SpeezleGame.Entities.Players
                 {
                     slideCDTimer = 0;
                     isSlidingLocked = true;
-                    //isDashingReleased = false;
+                    
                     isSliding = true;
                 }
             }
@@ -543,32 +546,7 @@ namespace SpeezleGame.Entities.Players
             HandleRectangleRectangleCollisions(RectangleMapObjects, mapObjects, elapsed); //handle collisions with rectangle objects
         }
 
-        /*private void HandleRaycastCollision(List<Rectangle> RectangleCollisionObjects, float elapsed)
-        {
-            Debug.WriteLine("Inraycast");
-            Rectangle bounds = playerBounds;
-            Raycast2D raycast = new Raycast2D(new Vector2(playerBounds.Center.X, playerBounds.Center.Y), new Vector2(movement, 0));
-            List<float?> raycastLengths = new List<float?>();
-            foreach(var collisionObject in RectangleCollisionObjects)
-            {
-                float? raycastLength = raycast.Intersects(collisionObject);
-                raycastLengths.Add(raycastLength);
-            }
 
-            float? distance = raycastLengths.Min();
-            
-            Vector2 nextFramePlayerPos = Position + (velocity * elapsed);
-            nextFramePlayerPos = new Vector2((float)Math.Round(Position.X), (float)Math.Round(Position.Y));
-            float nextPlrPosX = nextFramePlayerPos.X;
-            float distancePlrWillMove = Math.Abs(Position.X - nextPlrPosX);
-            if(distance < distancePlrWillMove)
-            {
-                Debug.WriteLine("velocity made 0");
-                velocity.X = 0.0f;
-            }
-            
-
-        }*/
         private void HandleRectangleRectangleCollisions(List<Rectangle> RectangleMapObjects, List<MapObject> mapObjects, float elapsed)
         {
             Rectangle bounds = playerBounds;
@@ -639,12 +617,18 @@ namespace SpeezleGame.Entities.Players
                     else if(leverObj != null && !DoorLocked)
                     {
                         DoorLocked = true;
+                        leverObj.Activated = !leverObj.Activated;
                         DoorObject targetDoor = FindObjectFromID(leverObj.TargetDoorID, mapObjects) as DoorObject;
                         targetDoor.ChangeDoorState();
-                        if (mapObjectsToNotRender.Contains(targetDoor))
-                            mapObjectsToNotRender.Remove(targetDoor);
+                        if (mapObjectsToChange.Contains(targetDoor))
+                            mapObjectsToChange.Remove(targetDoor);
                         else
-                            mapObjectsToNotRender.Add(targetDoor);
+                            mapObjectsToChange.Add(targetDoor);
+
+                        if (mapObjectsToChange.Contains(leverObj))
+                            mapObjectsToChange.Remove(leverObj);
+                        else
+                            mapObjectsToChange.Add(leverObj);
 
                     }
                     else if(coinObj != null && coinObj.IsCollected == false)
@@ -746,6 +730,17 @@ namespace SpeezleGame.Entities.Players
         {
             List<Vector2> list = new List<Vector2>();
             foreach(var obj in mapObjectsToNotRender)
+            {
+                list.AddRange(obj.tileCoordinates);
+            }
+
+            return list;
+        }
+
+        public List<Vector2> GetChangedTileList()
+        {
+            List<Vector2> list = new List<Vector2>();
+            foreach (var obj in mapObjectsToChange)
             {
                 list.AddRange(obj.tileCoordinates);
             }

@@ -14,6 +14,8 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using SpeezleGame.States;
 using SpeezleGame.Renderers;
+using System.Runtime.CompilerServices;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.Core
 {
@@ -28,7 +30,7 @@ namespace SpeezleGame.Core
         public TileRenderer tileRenderer;
         public BackgroundRenderer backgroundRenderer;
 
-        //private Player _player;
+        private SaveLoadManager saveLoadManager;
 
 
 
@@ -46,12 +48,13 @@ namespace SpeezleGame.Core
             backgroundRenderer = new BackgroundRenderer(this);
             tileRenderer = new TileRenderer(this);
 
+            
 
 
-            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;//ScreenManager.ScreenWidth ;
-            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;//ScreenManager.ScreenHeight;
+            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             Graphics.IsFullScreen = false;
-            Graphics.ApplyChanges(); //set temporary window size
+            Graphics.ApplyChanges(); 
 
             GameStateManager.Instance.Initialize(this, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,GraphicsDevice);
 
@@ -62,10 +65,12 @@ namespace SpeezleGame.Core
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            saveLoadManager = GameStateManager.Instance.GetSaveLoadManager();
+            Debug.WriteLine("afwefdssfd " + saveLoadManager.currentUser.userLevelDatas.Count);
             GameStateManager.Instance.SetContent(Content);
-            GameStateManager.Instance.AddScreen(new MainMenuState(GraphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,this ));
+            GameStateManager.Instance.AddScreen(new SaveSlotsState(GraphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,this , saveLoadManager ));
 
-            //ScreenManager.Instance.LoadContent(Content, GraphicsDevice);
+            
             
         }
 
@@ -77,7 +82,7 @@ namespace SpeezleGame.Core
 
             GameStateManager.Instance.Update(gameTime);
 
-            //ScreenManager.Instance.Update(gameTime);
+            
 
             base.Update(gameTime);
         }
@@ -85,7 +90,7 @@ namespace SpeezleGame.Core
         protected override void UnloadContent()
         {
             GameStateManager.Instance.UnloadContent();
-            //ScreenManager.Instance.UnloadContent();
+            
         }
         protected override void Draw(GameTime gameTime)
         {
@@ -95,13 +100,20 @@ namespace SpeezleGame.Core
 
             GameStateManager.Instance.Draw(_spriteBatch, gameTime);
 
-            //ScreenManager.Instance.Draw(_spriteBatch, gameTime);
+            
             base.Draw(gameTime);
 
            
             
 
             
+        }
+
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+
+
         }
 
 

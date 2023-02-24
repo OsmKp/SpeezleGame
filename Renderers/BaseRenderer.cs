@@ -23,7 +23,7 @@ namespace SpeezleGame.Renderers
         public GraphicsDeviceManager Graphics
         {
             get { return Game.Graphics; }
-            //set { this.Game.GraphicsDevice = value; }
+           
         }
         public BaseRenderer(Core.SpeezleGame game)
         {
@@ -51,7 +51,7 @@ namespace SpeezleGame.Renderers
         public abstract void Initialize();
         public abstract void Draw(GameTime gameTime);
 
-        public virtual void Draw(GameTime gameTime, List<Vector2> tilesToNotRender)
+        public virtual void Draw(GameTime gameTime, List<Vector2> tilesToNotRender, List<Vector2>  tilesToChange)
         {
 
         }

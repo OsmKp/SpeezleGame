@@ -50,8 +50,7 @@ namespace SpeezleGame.UI
                 var x = (ButtonDrawSize.X + (ButtonDrawSize.Width  / 2) - (_font.MeasureString(Text).X / 2));
                 var y = (ButtonDrawSize.Y + (ButtonDrawSize.Height / 2) - (_font.MeasureString(Text).Y / 2) - 2);
 
-                //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
-                //spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+                
                 spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour, 0f, new Vector2(0,0), 1f, SpriteEffects.None, 0.1f);
             }
         }

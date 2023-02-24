@@ -21,23 +21,26 @@ namespace SpeezleGame.Core
 
         private const int halfRenderTargetWidth = 320;
         private const int halfRenderTargetHeight = 180;
-        
+
+        private int mapWidth;
+        private int mapHeight;
 
 
 
-        public Camera(Player targetPlayer, Viewport vp)
+        public Camera(Player targetPlayer, Viewport vp, int camW, int camH)
         {
             camPos = Vector2.Zero;
 
             playerToFollow = targetPlayer;
 
-            
+            mapWidth = camW;
+            mapHeight = camH;
 
             
             viewport = vp;
         }
 
-        private void Smoothing(Vector2 target)
+        private void Smoothing(Vector2 target) //This function makes the camera movement smooth when player is making sharp moves.
         {
             float xFactor = (target.X - camPos.X) / 5;
             if(xFactor < 0.01f)
@@ -48,9 +51,9 @@ namespace SpeezleGame.Core
             {
                 camPos.X = 0;
             }
-            else if(camPos.X + 640 > 1920)
+            else if(camPos.X + 640 > mapWidth)
             {
-                camPos.X = 1920 - 640;
+                camPos.X = mapWidth - 640;
             }
 
             float yFactor = (target.Y - camPos.Y) / 8;
@@ -63,7 +66,7 @@ namespace SpeezleGame.Core
 
 
 
-        private Vector2 GetTarget()
+        private Vector2 GetTarget() //Gets the player position
         {
             var playerRectangle = playerToFollow.playerBounds;
             Vector2 target = new Vector2(playerToFollow.Position.X + (playerRectangle.Width / 2) - halfRenderTargetWidth,
@@ -72,13 +75,14 @@ namespace SpeezleGame.Core
             return target;
         }
 
-        public void SetMatrix()
+        public void SetMatrix() //Creates a transformation matrix to draw everything in the right position
         {
-            //Matrix scaleMatrix = Matrix.CreateTranslation(new Vector3(plrPos.X, plrPos.Y, 0)) * Matrix.CreateScale(new Vector3(0.8f, 0.8f, 1));   //FIX THIS ZOOMING PROBLEM
-            TransformMatrix = Matrix.CreateTranslation(new Vector3(-camPos.X, -camPos.Y, 0)) * Matrix.CreateScale(new Vector3(1f, 1f, 1));
+            
+            TransformMatrix = Matrix.CreateTranslation(new Vector3(-camPos.X, -camPos.Y, 0)) * Matrix.CreateScale(new Vector3(1f, 1f, 1)); 
+            
         }
 
-        public void Follow()
+        public void Follow() //This function is called every frame so that camera position can be updated
         {
             Vector2 target = GetTarget();
             
@@ -87,17 +91,6 @@ namespace SpeezleGame.Core
             SetMatrix();
 
             
-            /*var playerPos = Matrix.CreateTranslation(
-                -playerRectangle.X -16- (playerRectangle.Width / 2),
-                -playerRectangle.Y -16- (playerRectangle.Height / 2),
-                0);
-
-            var offset = Matrix.CreateTranslation(
-                640 / 2,
-                360 / 2,
-                0);
-
-            TransformMatrix = playerPos * offset;*/
         }
 
     }

@@ -12,7 +12,7 @@ namespace SpeezleGame.Physics
         public static Vector2 GetIntersectionDepth(this Rectangle rectA, Rectangle rectB)
         {
             
-            //currently not in use
+            
             float halfWidthA = rectA.Width / 2.0f;
             float halfHeightA = rectA.Height / 2.0f;
             float halfWidthB = rectB.Width / 2.0f;

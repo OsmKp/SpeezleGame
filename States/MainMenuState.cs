@@ -17,6 +17,7 @@ using System.Security.Cryptography.X509Certificates;
 using SpeezleGame.Core;
 using SpeezleGame.Renderers;
 using SpeezleGame.Graphics;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.States
 {
@@ -29,9 +30,11 @@ namespace SpeezleGame.States
         Texture2D playSoloTexture;
         SpriteFont playSoloFont;
 
+        private int coinAmount;
 
-        public MainMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : 
-            base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer,backgroundRenderer ,game)
+
+        public MainMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game,SaveLoadManager saveLoadManager) : 
+            base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer,backgroundRenderer ,game, saveLoadManager)
         {
 
         }
@@ -94,6 +97,8 @@ namespace SpeezleGame.States
             playSoloFont = contentManager.Load<SpriteFont>("Test/generalFont");
 
             
+            coinAmount = saveLoadManager.currentUser.GetCurrency();
+            
             //PlaySolo Button
             Button PlaySolo = new Button(playSoloTexture, playSoloFont)
             {
@@ -116,24 +121,33 @@ namespace SpeezleGame.States
             Quit.Click += Quit_Click;
             //Quit Button End
 
+            Label CoinDisplay = new Label(playSoloTexture, playSoloFont)
+            {
+                Position = new Vector2(5, 5),
+                Text = coinAmount.ToString(),
+                Layer = 0.1f,
+            };
+
             _components = new List<Component>()
             {
                 PlaySolo,
                 Quit,
+                CoinDisplay,
             };
             
         }
 
         private void Quit_Click(object sender, EventArgs e)
         {
-            //_speezleGame.Exit();
+            saveLoadManager.SaveUserData();
             game.Exit();
+
         }
         private void PlaySolo_Click(object sender, EventArgs e)
         {
             //load the next state
             
-            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer,tileRenderer, backgroundRenderer,game));
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer,tileRenderer, backgroundRenderer,game, saveLoadManager));
         }
 
     }

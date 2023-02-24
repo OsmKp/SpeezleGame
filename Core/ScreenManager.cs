@@ -15,8 +15,8 @@ namespace SpeezleGame.Core
         private readonly static int MinDimensions = 64;
         private readonly static int MaxDimensions = 4096;
 
-        public static int ScreenWidth = 1920; //test
-        public static int ScreenHeight = 1080; //test
+        public static int ScreenWidth = 1920; 
+        public static int ScreenHeight = 1080; 
         
         public Texture2D LastFrame
         {
@@ -82,7 +82,7 @@ namespace SpeezleGame.Core
             isSet = false;
         }
 
-        public Rectangle CalculateDestinationRectangle()
+        public Rectangle CalculateDestinationRectangle() //Calculate the dimensions depending on the device
         {
             Rectangle backbufferBounds = this.game.GraphicsDevice.PresentationParameters.Bounds;
             float backbufferAspectRatio = (float)backbufferBounds.Width / backbufferBounds.Height;
@@ -112,31 +112,29 @@ namespace SpeezleGame.Core
 
         }
 
-        public void Display(/*SpriteHandler spriteHandler, */Matrix transform, bool textureFiltering = true)
+        public void Display(Matrix transform, bool textureFiltering = true)
         {
 
-           game.GraphicsDevice.Clear(Color.Black);
+            game.GraphicsDevice.Clear(Color.Black);
 
             Rectangle destinationRectangle = this.CalculateDestinationRectangle();
-            Debug.WriteLine("width " + destinationRectangle.Width + "height " + destinationRectangle.Height);
+            
 
             
 
             game.tileRenderer.Begin(Matrix.Identity, textureFiltering);
-            game.tileRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White);
+            game.tileRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White); //draw tiles
             game.tileRenderer.End();
 
             
 
             game.guiRenderer.Begin(Matrix.Identity, textureFiltering);
-            game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White);
+            game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White); //draw gui
             game.guiRenderer.End();
 
 
-            /*spriteHandler.Begin(textureFiltering, transform);
-            spriteHandler.Draw(target, null, destinationRectangle, Color.White);
-            spriteHandler.End();*/
+
         }
-        //public void Display()
+        
     }
 }

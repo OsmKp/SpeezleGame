@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using SpeezleGame.Renderers;
 using SpeezleGame.Core;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.States
 {
@@ -27,7 +28,10 @@ namespace SpeezleGame.States
         protected EntityRenderer entityRenderer;
         protected TileRenderer tileRenderer;
         protected BackgroundRenderer backgroundRenderer;
+
+        protected SaveLoadManager saveLoadManager;
         
+
         public KeyboardState KeyboardState
         {
             get
@@ -45,7 +49,7 @@ namespace SpeezleGame.States
             }
         }
 
-        public GameState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer,Core.SpeezleGame game)
+        public GameState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer,Core.SpeezleGame game, SaveLoadManager saveLoadManager)
         {
             _graphicsDevice = graphicsDevice;
             this.guiRenderer = guiRenderer;
@@ -53,6 +57,7 @@ namespace SpeezleGame.States
             this.tileRenderer = tileRenderer;
             this.backgroundRenderer = backgroundRenderer;
             this.game = game;
+            this.saveLoadManager = saveLoadManager;
         }
 
 

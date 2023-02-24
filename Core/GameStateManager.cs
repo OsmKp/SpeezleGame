@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SpeezleGame.Renderers;
 using SpeezleGame.States;
+using SpeezleGame.UserData;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,17 +26,21 @@ namespace SpeezleGame.Core
         private ContentManager Content;
         private static GameStateManager _instance;
         private Stack<GameState> _screens = new Stack<GameState>();
+
         private ScreenManager screenManager;
-        
+        private SaveLoadManager saveLoadManager;
+
         private SpeezleGame game;
-        private int renderingTargetDimW = 640;
+        private int renderingTargetDimW = 640; //eveyrthing is drawn onto a rendering target to be stretched depending on the device
         private int renderingTargetDimH = 360;
         public static Matrix TransformMatrix = Matrix.Identity;
         
-        public static Matrix transformMatrix; //maybe make a new class for resolution handling
+        public static Matrix transformMatrix;
+
+        public User CurrentUser;
 
 
-        public static GameStateManager Instance
+        public static GameStateManager Instance //A singleton controlling the game states
         {
             get
             {
@@ -49,7 +54,6 @@ namespace SpeezleGame.Core
         public GameStateManager()
         {
 
-            
         }
 
         public void Initialize(SpeezleGame game, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, GraphicsDevice graphicsDevice)
@@ -63,9 +67,14 @@ namespace SpeezleGame.Core
 
             var MapSize = new Vector2(960, 320);
             screenManager = new ScreenManager(this.game, renderingTargetDimW, renderingTargetDimH);
+
+            CurrentUser = new User();
+            CurrentUser.InitializeUser();
+            Debug.WriteLine("userleveldata: " + CurrentUser.userLevelDatas.Count);
+            Debug.WriteLine("initilaized user");
+            saveLoadManager = new SaveLoadManager(CurrentUser);
             
 
-            //transformMatrix = Matrix.CreateScale(new Vector3(Dimensions / MapSize, 1)); //a matrix that allows me to scale everything drawn on the screen
         }
         public void SetContent(ContentManager content)
         {
@@ -94,14 +103,7 @@ namespace SpeezleGame.Core
 
                 _screens.Peek().Initialize();
 
-                /*Texture2D currentFrameTexture;
-                PauseMenuState converted = screen as PauseMenuState;
-                if (converted != null)
-                {
-                    Debug.WriteLine("CONVERSION SUCCESSFUL");
-                    currentFrameTexture = screenManager.LastFrame;
-                    screen.SetBackgroundTexture(currentFrameTexture);
-                }*/
+
                 
 
                 
@@ -115,11 +117,11 @@ namespace SpeezleGame.Core
             }
             catch (Exception ex)
             {
-                // Log the exception
+                
             }
         }
 
-        // Removes the top screen from the stack
+        // Remove the top screen from the stack
         public void RemoveScreen()
         {
             if (_screens.Count > 0)
@@ -132,7 +134,7 @@ namespace SpeezleGame.Core
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception
+                    
                 }
             }
         }
@@ -154,15 +156,15 @@ namespace SpeezleGame.Core
             }
             catch (Exception ex)
             {
-                // Log the exception
+                
             }
         }
 
 
-        public void LoadEndScreen(int timeInLevel, string levelName, int coinsCollected)
+        public void LoadEndScreen(int timeInLevel, string levelName, int coinsCollected) //This is for the level ending screen
         {
             
-            this.ChangeScreen(new EndOfLevelState(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer ,game));
+            this.ChangeScreen(new EndOfLevelState(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer ,game,  saveLoadManager));
             _screens.Peek().InitializeForEnd(timeInLevel, levelName, coinsCollected);
         }
 
@@ -172,7 +174,7 @@ namespace SpeezleGame.Core
             {
                 if (_screens.Count > 0)
                 {
-                    _screens.Peek().Update(gameTime);
+                    _screens.Peek().Update(gameTime); //Update the screen at the top of the stack
                 }
             }
             catch (Exception ex)
@@ -181,17 +183,17 @@ namespace SpeezleGame.Core
             }
         }
 
+        public SaveLoadManager GetSaveLoadManager()
+        {
+            return saveLoadManager;
+        }
+
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             try
             {
                 if (_screens.Count > 0)
                 {
-                    /*
-                    EntityRenderer.Begin();
-
-                    EntityRenderer.End();
-                    */
 
                     screenManager.Set();
 

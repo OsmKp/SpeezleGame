@@ -23,18 +23,18 @@ namespace SpeezleGame.Renderers
 
         }
 
-        public override void Draw(GameTime gameTime, List<Vector2> tilesToNotRender)
+        public override void Draw(GameTime gameTime, List<Vector2> tilesToNotRender, List<Vector2> tilesToChange)
         {
             if (tileMapHandler != null)
             {
-                Debug.WriteLine("Called draw first");
-                tileMapHandler.Draw(SpriteBatch, tilesToNotRender);
+                
+                tileMapHandler.Draw(SpriteBatch, tilesToNotRender, tilesToChange);
             }
         }
 
         public void SetMapHandler(TileMapHandler handler)
         {
-            Debug.WriteLine("Called set first");
+            
             tileMapHandler = handler;
             
         }

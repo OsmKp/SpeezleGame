@@ -18,6 +18,7 @@ using SpeezleGame.Core;
 using SpeezleGame.Renderers;
 using SpeezleGame.Graphics;
 using System.Collections;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.States
 {
@@ -37,7 +38,7 @@ namespace SpeezleGame.States
 
 
 
-        public LevelSelectionState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game)
+        public LevelSelectionState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game,  saveLoadManager)
         {
         }
 
@@ -136,6 +137,8 @@ namespace SpeezleGame.States
                 verticalStretch = 4,
             };
 
+            LevelTwo.Click += LevelTwo_Click;
+
             Button LevelThree = new Button(levelTexture, generalFont)
             {
                 Position = new Vector2(288, 126),
@@ -196,13 +199,17 @@ namespace SpeezleGame.States
 
         private void LevelOne_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+        }
+        private void LevelTwo_Click(object sender, EventArgs e)
+        {
+            GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
         }
 
         private void Menu_Click(object sender, EventArgs e)
         {
-            //_speezleGame.Exit();
-            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+           
+            GameStateManager.Instance.ChangeScreen(new MainMenuState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
         }
     }
 }

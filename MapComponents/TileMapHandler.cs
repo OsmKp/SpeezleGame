@@ -48,7 +48,7 @@ namespace SpeezleGame.MapComponents
 
         }
 
-        public void Draw(SpriteBatch spriteBatch/*,Matrix transformMatrix*/, List<Vector2> changedTileSets)
+        public void Draw(SpriteBatch spriteBatch, List<Vector2> hiddenTileSets, List<Vector2> changedTileSets)
         {
 
 
@@ -80,10 +80,15 @@ namespace SpeezleGame.MapComponents
                         var tileset = tilesets[mapTileset.firstgid];
 
                         // Use the connection object as well as the tileset to figure out the source rectangle
-                        if (changedTileSets.Contains(new Vector2(tileX, tileY)))
+                        if (hiddenTileSets.Contains(new Vector2(tileX, tileY))) //if any tile should not be rendered (collected coin etc.) then replace it with an empty tile
                         {
                             gid = 11;
                         }
+                        if (changedTileSets.Contains(new Vector2(tileX, tileY))) //if any tile should not be rendered (collected coin etc.) then replace it with an empty tile
+                        {
+                            gid = gid + 1;
+                        }
+
 
                         var rect = map.GetSourceRect(mapTileset, tileset, gid);
 
@@ -133,7 +138,7 @@ namespace SpeezleGame.MapComponents
 
 
                         // Render sprite at position tileX, tileY using the rect
-                        //spriteHandler.Draw(tilesetTexture, source, destination, (float)rotation, effects, Color.White);
+                        
                         spriteBatch.Draw(tilesetTexture, destination, source, Color.White, (float)rotation, Vector2.Zero, effects, 0);
                     }
                 }

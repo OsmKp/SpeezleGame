@@ -20,6 +20,7 @@ using SpeezleGame.Renderers;
 using System.ComponentModel;
 using Component = SpeezleGame.UI.Component;
 using SpeezleGame.Graphics;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.States
 {
@@ -33,7 +34,7 @@ namespace SpeezleGame.States
         Texture2D backFrameTexture;
         SpriteFont generalFont;
 
-        public PauseMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game)
+        public PauseMenuState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game,  saveLoadManager)
         {
         }
 
@@ -57,11 +58,7 @@ namespace SpeezleGame.States
         {
             
         }
-        /*public override void SetBackgroundTexture(Texture2D bg)
-        {
-            Debug.WriteLine("setbgtextfirst");
-            _background = new Background(bg);
-        }*/
+
         public override void LoadContent(ContentManager content)
         {
             
@@ -158,7 +155,7 @@ namespace SpeezleGame.States
         private void Quit_Click(object sender, EventArgs e)
         {
 
-            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game,  saveLoadManager));
             
             
         }

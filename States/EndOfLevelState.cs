@@ -20,6 +20,7 @@ using SpeezleGame.Renderers;
 using System.ComponentModel;
 using Component = SpeezleGame.UI.Component;
 using SpeezleGame.Graphics;
+using SpeezleGame.UserData;
 
 namespace SpeezleGame.States
 {
@@ -58,7 +59,7 @@ namespace SpeezleGame.States
         Label LevelMessage;
 
         SpriteFont generalFont;
-        public EndOfLevelState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game)
+        public EndOfLevelState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game,  saveLoadManager)
         {
         }
 
@@ -94,6 +95,48 @@ namespace SpeezleGame.States
             CalculateStar(_timeLevelTook);
             Celebration.Text = "You Achieved " + StarsAchieved + " Stars!";
             LevelMessage.Text = "Level " + _levelNameFinished + " Cleared!";
+
+            UpdateUserStats();
+            
+        }
+        private void UpdateUserStats()
+        {
+            string nextLevelName = "Two";
+            if (levelNameFinished == "One")
+                nextLevelName = "Two";
+            if (levelNameFinished == "Two")
+                nextLevelName = "Three";
+            if (levelNameFinished == "Three")
+                nextLevelName = "Four";
+            if (levelNameFinished == "Four")
+                nextLevelName = "Five";
+
+            Debug.WriteLine("user name is: " + saveLoadManager.currentUser.Name);
+            Debug.WriteLine("coins: " + saveLoadManager.currentUser.GetCurrency());
+            saveLoadManager.currentUser.AddCurrency(coinsCollectedInPreviousLevel);
+
+            foreach(UserLevelData uld in saveLoadManager.currentUser.userLevelDatas)
+            {
+                if(uld.LevelName == levelNameFinished)
+                {
+                    if (StarsAchieved > uld.StarsAchieved)
+                        uld.StarsAchieved = StarsAchieved;
+
+                    if (timeLevelTook < uld.BestTimeSeconds)
+                        uld.BestTimeSeconds = timeLevelTook;
+
+                    uld.Completed = true;
+
+
+                }
+
+                if (levelNameFinished != "Five" && uld.LevelName == nextLevelName)
+                {
+                    uld.Unlocked = true;
+                }
+            }
+            
+
         }
 
         private void CalculateStar(int time)
@@ -320,13 +363,25 @@ namespace SpeezleGame.States
 
         private void Replay_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+            switch (levelNameFinished)
+            {
+                case "One":
+                    GameStateManager.Instance.ChangeScreen(new LevelOneState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Two":
+                    GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Three":
+
+                    break;
+            }
+            
         }
 
         private void Menu_Click(object sender, EventArgs e)
         {
-            //_speezleGame.Exit();
-            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game));
+            
+            GameStateManager.Instance.ChangeScreen(new LevelSelectionState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
         }
     }
 }
