@@ -33,6 +33,14 @@ namespace SpeezleGame.States
         Texture2D labelTexture;
         Texture2D backFrameTexture;
         Texture2D levelTexture;
+        Texture2D threeStarTexture;
+        Texture2D lockTexture;
+
+        Label LevelTwoLock;
+        Label LevelThreeLock;
+        Label LevelFourLock;
+        Label LevelFiveLock;
+
         SpriteFont generalFont;
 
 
@@ -94,16 +102,52 @@ namespace SpeezleGame.States
             _background = new Background(backgroundTexture);
         }
 
+        private void HandleLocks()
+        {
+            bool level2unlock = saveLoadManager.currentUser.IsLevelUnlocked("Two");
+            bool level3unlock = saveLoadManager.currentUser.IsLevelUnlocked("Three");
+            bool level4unlock = saveLoadManager.currentUser.IsLevelUnlocked("Four");
+            bool level5unlock = saveLoadManager.currentUser.IsLevelUnlocked("Five");
+
+            if (!level2unlock) { _components.Add(LevelTwoLock); }
+            if (!level3unlock) { _components.Add(LevelThreeLock); }
+            if (!level4unlock) { _components.Add(LevelFourLock); }
+            if (!level5unlock) { _components.Add(LevelFiveLock); }
+        }
         private void HandleUIInitialization(ContentManager contentManager)
         {
             labelTexture = contentManager.Load<Texture2D>("Test/EndLabel");
             buttonTexture = contentManager.Load<Texture2D>("Test/GreyButton");
             backFrameTexture = contentManager.Load<Texture2D>("Test/LevelSelectionBackFrame");
             levelTexture = contentManager.Load<Texture2D>("Test/LevelButton");
+            threeStarTexture = contentManager.Load<Texture2D>("Test/ThreeStars");
+            lockTexture = contentManager.Load<Texture2D>("Test/Lock");
 
             generalFont = contentManager.Load<SpriteFont>("Test/generalFont");
 
 
+            int level1stars = saveLoadManager.currentUser.GetStarsAchieved("One");
+            int level2stars = saveLoadManager.currentUser.GetStarsAchieved("Two");
+            int level3stars = saveLoadManager.currentUser.GetStarsAchieved("Three");
+            int level4stars = saveLoadManager.currentUser.GetStarsAchieved("Four");
+            int level5stars = saveLoadManager.currentUser.GetStarsAchieved("Five");
+
+            Rectangle rect1 = new Rectangle(0, 0, 16 * level1stars, 16);
+            float rect1RatioX = (float)(16 * level1stars) / threeStarTexture.Width;
+
+            Rectangle rect2 = new Rectangle(0, 0, 16 * level2stars, 16);
+            float rect2RatioX = (float)(16 * level2stars) / threeStarTexture.Width;
+
+            Rectangle rect3 = new Rectangle(0, 0, 16 * level3stars, 16);
+            float rect3RatioX = (float)(16 * level3stars) / threeStarTexture.Width;
+
+            Rectangle rect4 = new Rectangle(0, 0, 16 * level4stars, 16);
+            float rect4RatioX = (float)(16 * level4stars) / threeStarTexture.Width;
+
+            Rectangle rect5 = new Rectangle(0, 0, 16 * level5stars, 16);
+            float rect5RatioX = (float)(16 * level5stars) / threeStarTexture.Width;
+
+            
 
             //Backframe Label
             Label BackFrame = new Label(backFrameTexture, generalFont)
@@ -128,6 +172,17 @@ namespace SpeezleGame.States
 
             LevelOne.Click += LevelOne_Click;
 
+            Label LevelOneStars = new Label(threeStarTexture, generalFont)
+            {
+                Position = new Vector2(145, 116),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 1,
+                verticalStretch = 1,
+                sourceRect = rect1,
+                sourceRectRatioX = rect1RatioX,
+            };
+
             Button LevelTwo = new Button(levelTexture, generalFont)
             {
                 Position = new Vector2(213, 126),
@@ -135,9 +190,30 @@ namespace SpeezleGame.States
                 Layer = 0.1f,
                 horizontalStretch = 4,
                 verticalStretch = 4,
+                
             };
 
             LevelTwo.Click += LevelTwo_Click;
+
+            Label LevelTwoStars = new Label(threeStarTexture, generalFont)
+            {
+                Position = new Vector2(220, 116),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 1,
+                verticalStretch = 1,
+                sourceRect = rect2,
+                sourceRectRatioX = rect2RatioX,
+            };
+
+            LevelTwoLock = new Label(lockTexture, generalFont)
+            {
+                Position = new Vector2(230, 111),
+                Text = "",
+                Layer = 0.05f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
 
             Button LevelThree = new Button(levelTexture, generalFont)
             {
@@ -146,6 +222,29 @@ namespace SpeezleGame.States
                 Layer = 0.1f,
                 horizontalStretch = 4,
                 verticalStretch = 4,
+            };
+
+            LevelThree.Click += LevelThree_Click;
+
+
+            Label LevelThreeStars = new Label(threeStarTexture, generalFont)
+            {
+                Position = new Vector2(295, 116),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 1,
+                verticalStretch = 1,
+                sourceRect = rect3,
+                sourceRectRatioX = rect3RatioX,
+            };
+
+            LevelThreeLock = new Label(lockTexture, generalFont)
+            {
+                Position = new Vector2(3055, 111),
+                Text = "",
+                Layer = 0.05f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
             };
 
             Button LevelFour = new Button(levelTexture, generalFont)
@@ -157,6 +256,26 @@ namespace SpeezleGame.States
                 verticalStretch = 4,
             };
 
+            Label LevelFourStars = new Label(threeStarTexture, generalFont)
+            {
+                Position = new Vector2(370, 116),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 1,
+                verticalStretch = 1,
+                sourceRect = rect4,
+                sourceRectRatioX = rect4RatioX,
+            };
+
+            LevelFourLock = new Label(lockTexture, generalFont)
+            {
+                Position = new Vector2(380, 111),
+                Text = "",
+                Layer = 0.05f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
+            };
+
             Button LevelFive = new Button(levelTexture, generalFont)
             {
                 Position = new Vector2(436, 126),
@@ -164,6 +283,26 @@ namespace SpeezleGame.States
                 Layer = 0.1f,
                 horizontalStretch = 4,
                 verticalStretch = 4,
+            };
+
+            Label LevelFiveStars = new Label(threeStarTexture, generalFont)
+            {
+                Position = new Vector2(443, 116),
+                Text = "",
+                Layer = 0.1f,
+                horizontalStretch = 1,
+                verticalStretch = 1,
+                sourceRect = rect5,
+                sourceRectRatioX = rect5RatioX,
+            };
+
+            LevelFiveLock = new Label(lockTexture, generalFont)
+            {
+                Position = new Vector2(453, 111),
+                Text = "",
+                Layer = 0.05f,
+                horizontalStretch = 2,
+                verticalStretch = 2,
             };
 
             //Quit Button
@@ -185,14 +324,19 @@ namespace SpeezleGame.States
                 BackFrame,
                 Back,
                 LevelOne,
+                LevelOneStars,
                 LevelTwo,
+                LevelTwoStars,
                 LevelThree,
+                LevelThreeStars,
                 LevelFour,
+                LevelFourStars,
                 LevelFive,
+                LevelFiveStars,
 
             };
 
-
+            HandleLocks();
 
 
         }
@@ -203,7 +347,20 @@ namespace SpeezleGame.States
         }
         private void LevelTwo_Click(object sender, EventArgs e)
         {
-            GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            if (saveLoadManager.currentUser.IsLevelUnlocked("Two"))
+            {
+                GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            }
+            
+        }
+
+        private void LevelThree_Click(object sender, EventArgs e)
+        {
+            if (saveLoadManager.currentUser.IsLevelUnlocked("Three"))
+            {
+                GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            }
+
         }
 
         private void Menu_Click(object sender, EventArgs e)

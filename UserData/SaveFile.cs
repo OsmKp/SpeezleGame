@@ -14,8 +14,10 @@ namespace SpeezleGame.UserData
         public string FileName { get; set; }
         public bool empty = true;
         public List<UserLevelData> userLevelDatas;
+        public List<string> skinsOwned;
         public int Currency;
         public int NumberOfCompletedLevels;
+        public int NumberOfSkinsOwned;
 
 
         public void PrepareSlotPreview(SaveData savedata )
@@ -23,6 +25,7 @@ namespace SpeezleGame.UserData
             
 
             this.userLevelDatas = savedata.LevelData;
+            this.skinsOwned = savedata.OwnedSkins;
             Currency = savedata.Currency;
 
             int i = 0;
@@ -38,6 +41,18 @@ namespace SpeezleGame.UserData
                 
             }
             NumberOfCompletedLevels = i;
+
+            int j = 0;
+            if (savedata.OwnedSkins != null)
+            {
+                foreach (var skin in savedata.OwnedSkins)
+                {
+                    j++;
+                }
+
+            }
+            if(j == 0) { j = 1; }
+            NumberOfSkinsOwned = j;
 
         }
 

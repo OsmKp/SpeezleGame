@@ -30,6 +30,9 @@
     <Folder Include="Content\Test\" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Content\Test\levelthreetilemap.tmx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Test\leveltwotilemap.tmx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

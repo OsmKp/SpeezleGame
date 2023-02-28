@@ -31,7 +31,7 @@ namespace SpeezleGame.Entities.Players
 
         private GameState currentState;
         private GraphicsDevice graphicsDevice;
-
+        private string currentLevelName;
         
 
         public int CoinsCollected
@@ -132,9 +132,10 @@ namespace SpeezleGame.Entities.Players
             get
             {
                 
-                return new Rectangle((int)Position.X + 2, (int)Position.Y  , 14, 33);
+                return new Rectangle((int)Position.X + 2, (int)Position.Y  , WALK_ANIM_SPRITE_SIZE_WIDTH - 2, WALK_ANIM_SPRITE_SIZE_HEIGHT + 1);
             }
         }
+
         private Vector2 StartCoords;
 
         private List<MapObject> mapObjectsToNotRender = new List<MapObject>();
@@ -158,10 +159,11 @@ namespace SpeezleGame.Entities.Players
 
 
 
-        public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice, Vector2 startPos) 
+        public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice, Vector2 startPos, string currentLevel) 
         {
 
             Health = MaxHealth;
+            currentLevelName = currentLevel;
             StartCoords = startPos;
             //add animations to the player animation container
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Idle),
@@ -215,6 +217,7 @@ namespace SpeezleGame.Entities.Players
 
             if (!IsAlive)
             {
+                GameStateManager.Instance.LoadDeathScreen(currentLevelName);
                 //do stuff (bring death screen etc)
             }
 
@@ -314,9 +317,6 @@ namespace SpeezleGame.Entities.Players
         public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
         {
 
-            
-
-
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Vector2 previousPosition = Position;
 
@@ -364,6 +364,11 @@ namespace SpeezleGame.Entities.Players
                 Health = 0;
             }
 
+        }
+
+        public void DamagePlayer(int amount)
+        {
+            Health -= amount;
         }
 
         private float DoSlide(float movement, float VelocityX, GameTime gameTime)
@@ -614,22 +619,24 @@ namespace SpeezleGame.Entities.Players
                         Position = new Vector2(destination.Bounds.X, destination.Bounds.Y);
                         TeleportLocked = true;
                     }
-                    else if(leverObj != null && !DoorLocked)
+                    else if(leverObj != null && !DoorLocked) //Colliding with a lever object
                     {
                         DoorLocked = true;
                         leverObj.Activated = !leverObj.Activated;
                         DoorObject targetDoor = FindObjectFromID(leverObj.TargetDoorID, mapObjects) as DoorObject;
-                        targetDoor.ChangeDoorState();
-                        if (mapObjectsToChange.Contains(targetDoor))
-                            mapObjectsToChange.Remove(targetDoor);
-                        else
-                            mapObjectsToChange.Add(targetDoor);
+                        if (targetDoor != null)
+                        {
+                            targetDoor.ChangeDoorState();
+                            if (mapObjectsToChange.Contains(targetDoor))
+                                mapObjectsToChange.Remove(targetDoor);
+                            else
+                                mapObjectsToChange.Add(targetDoor);
 
-                        if (mapObjectsToChange.Contains(leverObj))
-                            mapObjectsToChange.Remove(leverObj);
-                        else
-                            mapObjectsToChange.Add(leverObj);
-
+                            if (mapObjectsToChange.Contains(leverObj))
+                                mapObjectsToChange.Remove(leverObj);
+                            else
+                                mapObjectsToChange.Add(leverObj);
+                        }
                     }
                     else if(coinObj != null && coinObj.IsCollected == false)
                     {
@@ -641,7 +648,7 @@ namespace SpeezleGame.Entities.Players
                     {
                         GameStateManager.Instance.LoadEndScreen(timeInLevel, endObj.CurrentLevel, CoinsCollected);
                     }
-                    else if(doorObj != null && doorObj.IsOpen == false)
+                    else if(doorObj != null && doorObj.IsOpen == false) //Colliding with a door
                     {
                         Vector2 depth = Physics.RectangleExtensions.GetIntersectionDepth(bounds, doorObj.Bounds);
                         if (depth != Vector2.Zero)

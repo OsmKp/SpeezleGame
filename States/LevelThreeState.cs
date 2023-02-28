@@ -8,18 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SpeezleGame.Entities;
-using SpeezleGame.MapComponents;
 
 namespace SpeezleGame.States
 {
-    public class LevelTwoState : GameLevelState
+    public class LevelThreeState : GameLevelState
     {
-        public LevelTwoState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
+        public LevelThreeState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
         {
-            tilemapPathName = "\\leveltwotilemap.tmx";
+            tilemapPathName = "\\levelthreetilemap.tmx";
             backgroundTexturePathName = "\\LevelBackground5";
-            currentLevel = "Two";
+            currentLevel = "Three";
 
         }
 

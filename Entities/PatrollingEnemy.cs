@@ -502,7 +502,7 @@ namespace SpeezleGame.Entities
 
             if (bounds.Intersects(player.playerBounds) && !isDamageLocked)
             {
-                player.Health -= this.Damage;
+                player.DamagePlayer(Damage);
                 isDamageLocked = true;
             }
 

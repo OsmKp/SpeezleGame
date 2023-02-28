@@ -66,7 +66,7 @@ namespace SpeezleGame.Core
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             saveLoadManager = GameStateManager.Instance.GetSaveLoadManager();
-            Debug.WriteLine("afwefdssfd " + saveLoadManager.currentUser.userLevelDatas.Count);
+            
             GameStateManager.Instance.SetContent(Content);
             GameStateManager.Instance.AddScreen(new SaveSlotsState(GraphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,this , saveLoadManager ));
 
@@ -103,10 +103,7 @@ namespace SpeezleGame.Core
             
             base.Draw(gameTime);
 
-           
-            
 
-            
         }
 
         protected override void OnExiting(object sender, EventArgs args)

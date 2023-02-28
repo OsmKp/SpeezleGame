@@ -24,12 +24,13 @@ namespace SpeezleGame.States
     {
         protected Player _player;
         protected NodeMap nodeMap;
+        
         protected int LevelTimeInt
         {
             get { return (int)Math.Round(levelTime); }
         }
         protected float levelTime;
-
+        protected string currentLevel;
         protected Background _background;
 
         protected TileMapHandler _tileMapHandler;
@@ -102,7 +103,8 @@ namespace SpeezleGame.States
             entityRenderer.SetEntity(_entities);
 
             HandleUIInitialization(contentManager);
-            Debug.WriteLine("uinitititi?");
+            
+
             guiRenderer.SetComponent(_components);
 
 
@@ -364,11 +366,23 @@ namespace SpeezleGame.States
 
         public virtual void HandlePlayerInitialization(ContentManager contentManager)
         {
-
+            string equippedSkinName = saveLoadManager.currentUser.GetEquippedSkin();
             Texture2D idleTexture = contentManager.Load<Texture2D>("Textures/CharacterIdleAnimation");
             Texture2D walkTexture = contentManager.Load<Texture2D>("Textures/CharacterWalkingAnim");
             Texture2D dashTexture = contentManager.Load<Texture2D>("Textures/CharacterWalkingAnim");
             Texture2D slideTexture = contentManager.Load<Texture2D>("Textures/CharacterWalkingAnim");
+            switch (equippedSkinName)
+            {
+                case "Steve":
+                    break;
+                case "Cactus":
+                    idleTexture = contentManager.Load<Texture2D>("Textures/CactusIdleAnimation2");
+                    walkTexture = contentManager.Load<Texture2D>("Textures/CactusWalkingAnimation2");
+                    dashTexture = contentManager.Load<Texture2D>("Textures/CactusWalkingAnimation2");
+                    slideTexture = contentManager.Load<Texture2D>("Textures/CactusWalkingAnimation2");
+                    break;
+            }
+
 
             PlayerTextureContainer playerContainer = new PlayerTextureContainer()
             {
@@ -379,7 +393,7 @@ namespace SpeezleGame.States
             };
 
 
-            _player = new Player(playerContainer, _graphicsDevice, PlayerStartCoord);
+            _player = new Player(playerContainer, _graphicsDevice, PlayerStartCoord, currentLevel);
             _entities.Add(_player);
         }
         public virtual void HandleBackgroundInitialization(ContentManager contentManager)
@@ -412,6 +426,7 @@ namespace SpeezleGame.States
 
 
             PolygonCollisionObjects = new List<TiledPolygon>();
+
             foreach (var obj in collisionLayer.objects) //get all the collidable objects on the map
             {
                 RectangleMapObjects.Add(new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height));
@@ -451,6 +466,7 @@ namespace SpeezleGame.States
             foreach (var obj in endLayer.objects)
             {
                 MapObjects.Add(new EndObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height), obj.name));
+
             }
             foreach (var obj in nodeLayer.objects)
             {

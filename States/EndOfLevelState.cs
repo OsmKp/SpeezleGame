@@ -26,10 +26,11 @@ namespace SpeezleGame.States
 {
     public class EndOfLevelState : GameState
     {
-        private const int ThreeStarTime = 30;
-        private const int TwoStarTime = 50;
-        private const int OneStarTime = 70;
+        private int ThreeStarTime = 30;
+        private int TwoStarTime = 50;
+        private int OneStarTime = 70;
 
+        private Dictionary<string, int[]> levelStarTimes;
         private int StarsAchieved;
 
         private List<Component> _components;
@@ -61,6 +62,15 @@ namespace SpeezleGame.States
         SpriteFont generalFont;
         public EndOfLevelState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,game,  saveLoadManager)
         {
+            levelStarTimes = new Dictionary<string, int[]>()
+            {
+                { "one", new [] {30,50,70} },
+                {"Two", new [] { 15, 30, 45} },
+                {"Three", new[]{20,30,40} },
+                {"Four", new[]{20,30,40} },
+                {"Five",new[] {20,30,40} },
+            };
+
         }
 
         
@@ -141,6 +151,16 @@ namespace SpeezleGame.States
 
         private void CalculateStar(int time)
         {
+            foreach(var kvp in levelStarTimes)
+            {
+                if(kvp.Key == levelNameFinished)
+                {
+                    ThreeStarTime = kvp.Value[0];
+                    TwoStarTime = kvp.Value[1];
+                    OneStarTime = kvp.Value[2];
+                }
+            }
+
             if (time < ThreeStarTime)
             {
                 StarsAchieved = 3;
@@ -319,6 +339,8 @@ namespace SpeezleGame.States
                 verticalStretch = 2,
             };
 
+            Next.Click += Next_Click;
+
             Button Replay = new Button(buttonTexture, generalFont)
             {
                 Position = new Vector2(156, 232),
@@ -372,10 +394,26 @@ namespace SpeezleGame.States
                     GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
                 case "Three":
-
+                    GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
             }
             
+        }
+
+        private void Next_Click(object sender, EventArgs e)
+        {
+            switch (levelNameFinished)
+            {
+                case "One":
+                    GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Two":
+                    GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Three":
+                    GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+            }
         }
 
         private void Menu_Click(object sender, EventArgs e)

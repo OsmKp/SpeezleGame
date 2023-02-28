@@ -68,6 +68,7 @@ namespace SpeezleGame.States
         public abstract void LoadContent(ContentManager content);
 
         public virtual void InitializeForEnd(int _timeLevelTook, string _levelNameFinished, int _coinsCollected) { }
+        public virtual void InitializeForDeath(string _levelNameFinished) { }
         
         public abstract void UnloadContent(ContentManager content);
         public abstract void Update(GameTime gameTime);

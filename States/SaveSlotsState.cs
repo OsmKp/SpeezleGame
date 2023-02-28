@@ -112,6 +112,10 @@ namespace SpeezleGame.States
             int slot2CompletedLevels = saveFile2.NumberOfCompletedLevels;
             int slot3CompletedLevels = saveFile3.NumberOfCompletedLevels;
 
+            int slot1SkinsOwned = saveFile1.NumberOfSkinsOwned;
+            int slot2SkinsOwned = saveFile2.NumberOfSkinsOwned;
+            int slot3SkinsOwned = saveFile3.NumberOfSkinsOwned;
+
             Label Slot1Back = new Label(backFrame, generalFont)
             {
                 Position = new Vector2(20, 60),
@@ -168,7 +172,7 @@ namespace SpeezleGame.States
 
             Label Slot1Currency = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(52, 120),
+                Position = new Vector2(52, 110),
                 Text = "Currency: " + slot1Currency.ToString(),
                 Layer = 0.1f,
 
@@ -176,7 +180,7 @@ namespace SpeezleGame.States
             };
             Label Slot2Currency = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(252, 120),
+                Position = new Vector2(252, 110),
                 Text = "Currency: " + slot2Currency.ToString(),
                 Layer = 0.1f,
 
@@ -184,7 +188,7 @@ namespace SpeezleGame.States
             };
             Label Slot3Currency = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(452, 120),
+                Position = new Vector2(452, 110),
                 Text = "Currency: " + slot3Currency.ToString(),
                 Layer = 0.1f,
 
@@ -192,7 +196,7 @@ namespace SpeezleGame.States
             };
             Label Slot1Levels = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(52, 160),
+                Position = new Vector2(52, 150),
                 Text = "Completed Levels: " + slot1CompletedLevels.ToString(),
                 Layer = 0.1f,
 
@@ -200,7 +204,7 @@ namespace SpeezleGame.States
             };
             Label Slot2Levels = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(252, 160),
+                Position = new Vector2(252, 150),
                 Text = "Completed Levels: " + slot2CompletedLevels.ToString(),
                 Layer = 0.1f,
 
@@ -208,8 +212,35 @@ namespace SpeezleGame.States
             };
             Label Slot3Levels = new Label(displayTexture, generalFont)
             {
-                Position = new Vector2(452, 160),
+                Position = new Vector2(452, 150),
                 Text = "Completed Levels: " + slot3CompletedLevels.ToString(),
+                Layer = 0.1f,
+
+
+            };
+
+            Label Slot1Skins = new Label(displayTexture, generalFont)
+            {
+                Position = new Vector2(52, 190),
+                Text = "Skins Owned: " + slot1SkinsOwned.ToString(),
+                Layer = 0.1f,
+
+
+            };
+
+            Label Slot2Skins = new Label(displayTexture, generalFont)
+            {
+                Position = new Vector2(252, 190),
+                Text = "Skins Owned: " + slot2SkinsOwned.ToString(),
+                Layer = 0.1f,
+
+
+            };
+
+            Label Slot3Skins = new Label(displayTexture, generalFont)
+            {
+                Position = new Vector2(452, 190),
+                Text = "Skins Owned: " + slot3SkinsOwned.ToString(),
                 Layer = 0.1f,
 
 
@@ -217,7 +248,7 @@ namespace SpeezleGame.States
 
             Button Slot1 = new Button(buttonTexture, generalFont)
             {
-                Position = new Vector2(68, 230),
+                Position = new Vector2(68, 232),
                 Text = "Select",
                 Layer = 0.2f,
                 horizontalStretch = 3,
@@ -230,7 +261,7 @@ namespace SpeezleGame.States
             
             Button Slot2 = new Button(buttonTexture, generalFont)
             {
-                Position = new Vector2(268, 230),
+                Position = new Vector2(268, 232),
                 Text = "Select",
                 Layer = 0.2f,
                 horizontalStretch = 3,
@@ -242,7 +273,7 @@ namespace SpeezleGame.States
 
             Button Slot3 = new Button(buttonTexture, generalFont)
             {
-                Position = new Vector2(468, 230),
+                Position = new Vector2(468, 232),
                 Text = "Select",
                 Layer = 0.2f,
                 horizontalStretch = 3,
@@ -265,6 +296,9 @@ namespace SpeezleGame.States
                 Slot1Levels,
                 Slot2Levels,
                 Slot3Levels,
+                Slot1Skins,
+                Slot2Skins,
+                Slot3Skins,
                 Slot1,
                 Slot2,
                 Slot3,
@@ -338,7 +372,7 @@ namespace SpeezleGame.States
             //load menu screen
 
             
-            //Debug.WriteLine("arasgjfrdf" + saveLoadManager.currentUser.userLevelDatas.Count);
+           
         }
         private void Save2_Click(object sender, EventArgs e)
         {

@@ -32,6 +32,9 @@ namespace SpeezleGame.States
         {
             tilemapPathName = "\\tilemaptest.tmx";
             backgroundTexturePathName = "\\LevelBackground6";
+            currentLevel = "One";
+
+
         }
 
         public override void Initialize()

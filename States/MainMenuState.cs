@@ -28,7 +28,9 @@ namespace SpeezleGame.States
         private Background _background;
 
         Texture2D playSoloTexture;
+        Texture2D coinDisplay;
         SpriteFont playSoloFont;
+        
 
         private int coinAmount;
 
@@ -94,6 +96,7 @@ namespace SpeezleGame.States
         private void HandleUIInitialization(ContentManager contentManager)
         {
             playSoloTexture = contentManager.Load<Texture2D>("Test/GreyButton");
+            coinDisplay = contentManager.Load<Texture2D>("Test/CoinDisplay");
             playSoloFont = contentManager.Load<SpriteFont>("Test/generalFont");
 
             
@@ -102,7 +105,7 @@ namespace SpeezleGame.States
             //PlaySolo Button
             Button PlaySolo = new Button(playSoloTexture, playSoloFont)
             {
-                Position = new Vector2(260, 120),
+                Position = new Vector2(260, 70),
                 Text = "Play Solo",
                 Layer = 0.1f,
             };
@@ -113,7 +116,7 @@ namespace SpeezleGame.States
             //Quit Button
             Button Quit = new Button(playSoloTexture, playSoloFont)
             {
-                Position = new Vector2(260, 170),
+                Position = new Vector2(260, 220),
                 Text = "Quit",
                 Layer = 0.2f,
             };
@@ -121,7 +124,25 @@ namespace SpeezleGame.States
             Quit.Click += Quit_Click;
             //Quit Button End
 
-            Label CoinDisplay = new Label(playSoloTexture, playSoloFont)
+            Button Shop = new Button(playSoloTexture, playSoloFont)
+            {
+                Position = new Vector2(260, 170),
+                Text = "Shop",
+                Layer = 0.2f,
+            };
+
+            Shop.Click += Shop_Click;
+
+            Button Customize = new Button(playSoloTexture, playSoloFont)
+            {
+                Position = new Vector2(260, 120),
+                Text = "Customize",
+                Layer = 0.2f,
+            };
+
+            Customize.Click += Customize_Click;
+
+            Label CoinDisplay = new Label(coinDisplay, playSoloFont)
             {
                 Position = new Vector2(5, 5),
                 Text = coinAmount.ToString(),
@@ -132,9 +153,21 @@ namespace SpeezleGame.States
             {
                 PlaySolo,
                 Quit,
+                Shop,
                 CoinDisplay,
+                Customize,
             };
             
+        }
+
+        private void Customize_Click(object sender, EventArgs e)
+        {
+            GameStateManager.Instance.ChangeScreen(new CustomizeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+        }
+
+        private void Shop_Click(object sender, EventArgs e)
+        {
+            GameStateManager.Instance.ChangeScreen(new ShopState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
         }
 
         private void Quit_Click(object sender, EventArgs e)

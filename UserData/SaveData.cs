@@ -13,5 +13,7 @@ namespace SpeezleGame.UserData
     {
         public List<UserLevelData> LevelData { get; set; }
         public int Currency {get; set; }
+        public string EquippedSkin { get; set; }
+        public List<string> OwnedSkins { get; set; }
     }
 }

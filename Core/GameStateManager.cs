@@ -160,7 +160,11 @@ namespace SpeezleGame.Core
             }
         }
 
-
+        public void LoadDeathScreen(string levelName)
+        {
+            this.ChangeScreen(new DeathState(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            _screens.Peek().InitializeForDeath(levelName);
+        }
         public void LoadEndScreen(int timeInLevel, string levelName, int coinsCollected) //This is for the level ending screen
         {
             

@@ -11,16 +11,19 @@ namespace SpeezleGame.UserData
         public string Name { get; set; }
         public List<UserLevelData> userLevelDatas;
         private int Currency;
-        
+        public List<string> skinsOwned;
+        private string equippedSkin;
         public User()
         {
             Name = "User";
             Currency = 0;
-
+            equippedSkin = "Steve";
         }
 
         public void InitializeUser()
         {
+            skinsOwned = new List<string>();
+            skinsOwned.Add("Steve");
             userLevelDatas = new List<UserLevelData>();
             UserLevelData level1 = new UserLevelData(false, true, "One", 0, 9999);
             UserLevelData level2 = new UserLevelData(false, false, "Two", 0, 9999);
@@ -33,7 +36,31 @@ namespace SpeezleGame.UserData
             userLevelDatas.Add(level4);
             userLevelDatas.Add(level5);
         }
+        public bool IsLevelUnlocked(string name)
+        {
+            bool isUnlocked = false;
+            foreach(var uld in userLevelDatas)
+            {
+                if(uld.LevelName == name && uld.Unlocked == true)
+                {
+                    isUnlocked = true;
+                }
+            }
+            return isUnlocked;
+        }
 
+        public int GetStarsAchieved(string name)
+        {
+            int stars = 0;
+            foreach (var uld in userLevelDatas)
+            {
+                if (uld.LevelName == name)
+                {
+                    stars = uld.StarsAchieved;
+                }
+            }
+            return stars;
+        }
         public void AddCurrency(int amount)
         {
             Currency += amount;
@@ -45,6 +72,32 @@ namespace SpeezleGame.UserData
         public void SetCurrency(int amount)
         {
             Currency = amount;
+        }
+
+        public string GetEquippedSkin()
+        {
+            return equippedSkin;
+        }
+        public void SetEquippedSkin(string skin)
+        {
+            equippedSkin = skin;
+        }
+        public void AddNewSkin(string skin)
+        {
+            skinsOwned.Add(skin);
+        }
+
+        public bool IsSkinOwned(string skin)
+        {
+            bool isSkinOwned = false;
+            foreach(var name in skinsOwned)
+            {
+                if(name == skin)
+                {
+                    isSkinOwned = true;
+                }
+            }
+            return isSkinOwned;
         }
     }
 }

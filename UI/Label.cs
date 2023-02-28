@@ -20,6 +20,9 @@ namespace SpeezleGame.UI
         private Texture2D _texture;
 
         public Rectangle? sourceRect;
+
+        public float sourceRectRatioX = 1;
+
         public float Layer { get; set; }
         public Color PenColour { get; set; }
 
@@ -38,8 +41,9 @@ namespace SpeezleGame.UI
         }
         public Rectangle ButtonDrawSize
         {
-            get { return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width * horizontalStretch, _texture.Height * verticalStretch); }
+            get { return new Rectangle((int)Position.X, (int)Position.Y, (int)( _texture.Width * horizontalStretch * sourceRectRatioX), _texture.Height * verticalStretch); }
         }
+
 
         public override void Draw(SpriteBatch spriteBatch)
         {

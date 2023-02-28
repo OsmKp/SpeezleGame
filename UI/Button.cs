@@ -66,7 +66,7 @@ namespace SpeezleGame.UI
                 colour = Color.DarkGray;
                 
             }
-           
+             
             spriteBatch.Draw(_texture, ButtonDrawSize, null, colour, 0, new Vector2(0, 0), SpriteEffects.None, Layer);
             
             if (!string.IsNullOrEmpty(Text))

@@ -84,28 +84,28 @@ namespace SpeezleGame.Core
 
         public Rectangle CalculateDestinationRectangle() //Calculate the dimensions depending on the device
         {
-            Rectangle backbufferBounds = this.game.GraphicsDevice.PresentationParameters.Bounds;
+            Rectangle backbufferBounds = this.game.GraphicsDevice.PresentationParameters.Bounds; //monitor screen size
             float backbufferAspectRatio = (float)backbufferBounds.Width / backbufferBounds.Height;
-            float screenAspectRatio = (float)Width / Height;
+            float screenAspectRatio = (float)Width / Height; //target aspect ratio
 
             float rectX = 0f;
             float rectY = 0f;
             float rectWidth = backbufferBounds.Width;
             float rectHeight = backbufferBounds.Height; 
             
-            if(backbufferAspectRatio > screenAspectRatio)
+            if(backbufferAspectRatio > screenAspectRatio) //if the aspect ratio of the monitor is larger than target aspect ratio
             {
-                rectWidth = rectHeight * screenAspectRatio;
-                rectX = (backbufferBounds.Width - rectWidth) / 2f;
+                rectWidth = rectHeight * screenAspectRatio; //calculate the largest target rectangle width while maintaining the height
+                rectX = (backbufferBounds.Width - rectWidth) / 2f; //calculate top left X-coordinate
             }
-            else if(screenAspectRatio > backbufferAspectRatio)
+            else if(screenAspectRatio > backbufferAspectRatio) //if the aspect ratio of the monitor is smaller than target aspect ratio
             {
-                rectHeight = rectWidth / screenAspectRatio;
-                rectY = (backbufferBounds.Height - rectHeight) / 2f;
+                rectHeight = rectWidth / screenAspectRatio; //calculate largest rectangle height while maintaining the aspect ratio
+                rectY = (backbufferBounds.Height - rectHeight) / 2f; //calculate top left y-coordinate
             }
 
-            Rectangle result = new Rectangle((int)rectX, (int)rectY, (int)rectWidth, (int)rectHeight);
-            stretchRatio = rectWidth / target.Width;
+            Rectangle result = new Rectangle((int)rectX, (int)rectY, (int)rectWidth, (int)rectHeight); //create the target rectangle
+            stretchRatio = rectWidth / target.Width; //calculate stretch ratio
             shiftAmountVector = new Vector2(rectX, rectY);
 
             return result;
