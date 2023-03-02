@@ -19,5 +19,7 @@ namespace SpeezleGame.Entities
 
         public virtual void Update(GameTime gameTime, Vector2 playerPos, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects) { }
         public virtual void Update(GameTime gameTime, Vector2 playerPos, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, Player player) { }
+
+
     }
 }

@@ -38,8 +38,8 @@ namespace SpeezleGame.States
         bool isCactusEquipped;
         string button2Text = "Not Unlocked";
 
-        bool isThirdequiiped;
-        bool isthirbof;
+        bool isFlowerEquipped;
+        bool isFlowerBought;
         string button3Text = "Not Unlocked";
         public CustomizeState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
         {
@@ -90,7 +90,7 @@ namespace SpeezleGame.States
         private void HandleOwnership()
         {
             isCactusBought = saveLoadManager.currentUser.IsSkinOwned("Cactus");
-            isthirbof = saveLoadManager.currentUser.IsSkinOwned("fada");
+            isFlowerBought = saveLoadManager.currentUser.IsSkinOwned("Flower");
 
             if (saveLoadManager.currentUser.GetEquippedSkin() == "Steve")
             {
@@ -115,7 +115,7 @@ namespace SpeezleGame.States
             {
                 button2Text = "Not Unlocked";
             }
-            if (!isthirbof)
+            if (!isFlowerBought)
             {
                 button3Text = "Not Unlocked";
             }
@@ -124,7 +124,7 @@ namespace SpeezleGame.States
         private void UpdateText()
         {
             isCactusBought = saveLoadManager.currentUser.IsSkinOwned("Cactus");
-            isthirbof = saveLoadManager.currentUser.IsSkinOwned("fada");
+            isFlowerBought = saveLoadManager.currentUser.IsSkinOwned("Flower");
 
             if (saveLoadManager.currentUser.GetEquippedSkin() == "Steve")
             {
@@ -149,7 +149,7 @@ namespace SpeezleGame.States
             {
                 button2Text = "Not Unlocked";
             }
-            if (!isthirbof)
+            if (!isFlowerBought)
             {
                 button3Text = "Not Unlocked";
             }
@@ -169,7 +169,7 @@ namespace SpeezleGame.States
             buyButtonTexture = contentManager.Load<Texture2D>("Test/DisplayGuiTexture");
             skin1Texture = contentManager.Load<Texture2D>("Test/SteveSkinFrame");
             skin2Texture = contentManager.Load<Texture2D>("Test/TestSkinFrame");
-            skin3Texture = contentManager.Load<Texture2D>("Test/TestSkinFrame2");
+            skin3Texture = contentManager.Load<Texture2D>("Test/FlowerSkinFrame");
             backButtonTexture = contentManager.Load<Texture2D>("Test/GreyButton");
 
             Label SkinFrame1 = new Label(skin1Texture, font)
@@ -274,9 +274,9 @@ namespace SpeezleGame.States
 
         private void Button3_Click(object sender, EventArgs e)
         {
-            if (saveLoadManager.currentUser.IsSkinOwned("fd") == true)
+            if (saveLoadManager.currentUser.IsSkinOwned("Flower") == true)
             {
-                saveLoadManager.currentUser.SetEquippedSkin("fd");
+                saveLoadManager.currentUser.SetEquippedSkin("Flower");
                 UpdateText();
             }
         }

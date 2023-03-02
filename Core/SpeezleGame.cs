@@ -33,7 +33,6 @@ namespace SpeezleGame.Core
         private SaveLoadManager saveLoadManager;
 
 
-
         public SpeezleGame()
         {
             Graphics = new GraphicsDeviceManager(this);
@@ -47,9 +46,6 @@ namespace SpeezleGame.Core
             entityRenderer = new EntityRenderer(this);
             backgroundRenderer = new BackgroundRenderer(this);
             tileRenderer = new TileRenderer(this);
-
-            
-
 
             Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
@@ -69,11 +65,7 @@ namespace SpeezleGame.Core
             
             GameStateManager.Instance.SetContent(Content);
             GameStateManager.Instance.AddScreen(new SaveSlotsState(GraphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer,this , saveLoadManager ));
-
-            
-            
         }
-
 
         protected override void Update(GameTime gameTime)
         {
@@ -81,8 +73,6 @@ namespace SpeezleGame.Core
                 Exit();
 
             GameStateManager.Instance.Update(gameTime);
-
-            
 
             base.Update(gameTime);
         }
@@ -95,24 +85,18 @@ namespace SpeezleGame.Core
         protected override void Draw(GameTime gameTime)
         {
 
-
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             GameStateManager.Instance.Draw(_spriteBatch, gameTime);
 
-            
             base.Draw(gameTime);
 
-
         }
-
         protected override void OnExiting(object sender, EventArgs args)
         {
             base.OnExiting(sender, args);
 
-
         }
-
 
     }
 }

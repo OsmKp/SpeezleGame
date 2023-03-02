@@ -24,7 +24,7 @@ namespace SpeezleGame.Core
         GraphicsDevice graphicsDevice;
 
         private ContentManager Content;
-        private static GameStateManager _instance;
+        
         private Stack<GameState> _screens = new Stack<GameState>();
 
         private ScreenManager screenManager;
@@ -40,6 +40,7 @@ namespace SpeezleGame.Core
         public User CurrentUser;
 
 
+        private static GameStateManager _instance;
         public static GameStateManager Instance //A singleton controlling the game states
         {
             get
@@ -51,6 +52,7 @@ namespace SpeezleGame.Core
                 return _instance;
             }
         }
+
         public GameStateManager()
         {
 
@@ -70,8 +72,7 @@ namespace SpeezleGame.Core
 
             CurrentUser = new User();
             CurrentUser.InitializeUser();
-            Debug.WriteLine("userleveldata: " + CurrentUser.userLevelDatas.Count);
-            Debug.WriteLine("initilaized user");
+
             saveLoadManager = new SaveLoadManager(CurrentUser);
             
 
@@ -103,11 +104,6 @@ namespace SpeezleGame.Core
 
                 _screens.Peek().Initialize();
 
-
-                
-
-                
-                
                 // Call the LoadContent on the screen
                 if (Content != null)
                 {

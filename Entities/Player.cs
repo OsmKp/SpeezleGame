@@ -29,10 +29,7 @@ namespace SpeezleGame.Entities.Players
         private const int WALK_ANIM_SPRITE_SIZE_WIDTH = 16;
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
 
-        private GameState currentState;
-        private GraphicsDevice graphicsDevice;
         private string currentLevelName;
-        
 
         public int CoinsCollected
         {
@@ -42,7 +39,6 @@ namespace SpeezleGame.Entities.Players
 
         public int timeInLevel;
 
-        private readonly Vector2 gravity = new Vector2(0, 10f);
 
         public bool IsAlive { get { return isAlive; } }
         bool isAlive = true;
@@ -82,12 +78,6 @@ namespace SpeezleGame.Entities.Players
         private const float MaxFallSpeed = 300.0f;
         private const float JumpControlPower = 0.14f;
 
-        private const float MaxDashTime = 0.2f;
-        private const float DashSpeed = 600.0f;
-
-        private const float MaxSlideTime = 0.7f;
-        private const float SlideControlPower = 0.14f;
-        private const float SlideLaunchVelocity = 1200.0f;
 
         //movement direction
         private float movement;
@@ -103,19 +93,22 @@ namespace SpeezleGame.Entities.Players
         private bool isSliding;
         private bool isSlidingPressed;
         private bool isSlidingLocked;
-        private bool wasSliding;
         private float slideTime;
         private const float slideCD = 5.0f;
         private float slideCDTimer;
+        private const float MaxSlideTime = 0.7f;
+        private const float SlideControlPower = 0.14f;
+        private const float SlideLaunchVelocity = 1200.0f;
 
         //variables and constants for dashing
         private bool isDashing;
         private bool isDashingPressed;
         private bool isDashLocked ;
-        //private bool wasDashing ;
         private float dashTime;
         private const float dashCD = 5.0f;
         private float dashCDTimer;
+        private const float MaxDashTime = 0.2f;
+        private const float DashSpeed = 600.0f;
 
         public string DashCooldownString;
         public string SlideCooldownString;
@@ -149,15 +142,9 @@ namespace SpeezleGame.Entities.Players
         private float DoorCounter;
         private bool DoorLocked;
 
-        private const float EPSILON = 0.00001f;
         public int DrawOrder { get; set; }
 
         public int UpdateOrder { get; set; }
-
-
-
-
-
 
         public Player(PlayerTextureContainer container, GraphicsDevice graphicsDevice, Vector2 startPos, string currentLevel) 
         {
@@ -169,6 +156,8 @@ namespace SpeezleGame.Entities.Players
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Idle),
                 new SpriteAnimation(container.Idle, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Walk),
+                /*new SpriteAnimation(container.Jump, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
+            _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Jump),*/
                 new SpriteAnimation(container.Walk, WALK_ANIM_SPRITE_COUNT, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
             _renderingStateMachine.AddState(nameof(PlayerTextureContainer.Dash),
                 new SpriteAnimation(container.Dash, 1, WALK_ANIM_SPRITE_SIZE_WIDTH, WALK_ANIM_SPRITE_SIZE_HEIGHT));
@@ -253,17 +242,10 @@ namespace SpeezleGame.Entities.Players
 
             _renderingStateMachine.Update(gameTime);
 
-
-
-            //camera.Follow();
-            
-
             movement = 0.0f;
             isJumping = false;
             
         }
-
-
 
         //get key inputs
         private void GetInput(KeyboardState keyboardState, MouseState mouseState)
@@ -281,9 +263,6 @@ namespace SpeezleGame.Entities.Players
             }
 
             isJumping = keyboardState.IsKeyDown(Keys.Space);
-
-            
-
 
             if (!isDashLocked)
             {
@@ -309,9 +288,6 @@ namespace SpeezleGame.Entities.Players
                 }
             }
 
-
-
-
         }
 
         public void ApplyPhysics(GameTime gameTime, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects)
@@ -321,7 +297,7 @@ namespace SpeezleGame.Entities.Players
             Vector2 previousPosition = Position;
 
             velocity.X += movement * MoveAcceleration * elapsed; //increase player horizontal velocity using the acceleration
-            Debug.WriteLine("X speed is: " + velocity.X);
+            
             velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
             //increase player vertical velocity using the gravity and other variables
 
@@ -397,8 +373,8 @@ namespace SpeezleGame.Entities.Players
                 }
                 if (isJumping)
                 {
-                    Debug.WriteLine("cancel slide now");
                     
+                    isSliding = false;
                 }
             }
             else
@@ -406,15 +382,11 @@ namespace SpeezleGame.Entities.Players
 
                 slideTime = 0.0f;
             }
-            if (isJumping)
-            {
-                Debug.WriteLine("cancel slide now");
-                
-            }
+
 
             if (slideCDTimer >= slideCD) //if timer exceeds the cooldown then make the dash available and reset the timer
             {
-                Debug.WriteLine("Cooldown reset");
+                
                 slideCDTimer = 0;
                 isSlidingLocked = false;
             }
@@ -424,22 +396,19 @@ namespace SpeezleGame.Entities.Players
             }
 
 
-            Debug.WriteLine("Cooldown of slide: " + Math.Round(slideCD - slideCDTimer)); // debuggin purp
+            
             SlideCooldownString = Math.Round(slideCD - slideCDTimer, MidpointRounding.AwayFromZero).ToString();
             if(!isSlidingLocked)
             {
                 SlideCooldownString = "Ready";
             }
 
-            wasSliding = isSliding;
+            
             return VelocityX;
         }
 
-        
         private float DoDash(float movement, float VelocityX, GameTime gameTime)
         {
-
-
 
             if (isDashing)
             {
@@ -476,7 +445,7 @@ namespace SpeezleGame.Entities.Players
 
             if (dashCDTimer >= dashCD) //if timer exceeds the cooldown then make the dash available and reset the timer
             {
-                Debug.WriteLine("Cooldown reset");
+                
                 dashCDTimer = 0;
                 isDashLocked = false;
             }
@@ -486,15 +455,11 @@ namespace SpeezleGame.Entities.Players
             }
             
 
-            Debug.WriteLine("Cooldown: " + Math.Round(dashCD - dashCDTimer)); // debuggin purp
-
             DashCooldownString = Math.Round(dashCD - dashCDTimer, MidpointRounding.AwayFromZero).ToString();
             if (!isDashLocked)
             {
                 DashCooldownString = "Ready";
             }
-
-
 
             return VelocityX;
 
@@ -509,7 +474,6 @@ namespace SpeezleGame.Entities.Players
                     jumpCounter = 0;
 
                 }
-
                 if((!wasJumping &&  jumpCounter<2) || jumpTime > 0.0f) //if just starting jump or jumping
                 {
                     if((!wasJumping && jumpCounter < 2))
@@ -543,10 +507,6 @@ namespace SpeezleGame.Entities.Players
         private void HandleCollisions(List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects,float elapsed)
         {
 
-            
-            
-            
-            
             
             HandleRectangleRectangleCollisions(RectangleMapObjects, mapObjects, elapsed); //handle collisions with rectangle objects
         }
@@ -732,7 +692,6 @@ namespace SpeezleGame.Entities.Players
             }
         }
         
-
         public List<Vector2> GetUnrenderedTileList()
         {
             List<Vector2> list = new List<Vector2>();
@@ -779,7 +738,6 @@ namespace SpeezleGame.Entities.Players
                 DoorCounter += elapsed;
             }
         }
-
         private MapObject FindObjectFromID(int id, List<MapObject> objects)
         {
             foreach(var obj in objects)
@@ -789,8 +747,5 @@ namespace SpeezleGame.Entities.Players
             }
             return null;
         }
-
-
-
     }
 }

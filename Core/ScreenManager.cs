@@ -111,28 +111,20 @@ namespace SpeezleGame.Core
             return result;
 
         }
-
+         
         public void Display(Matrix transform, bool textureFiltering = true)
         {
-
             game.GraphicsDevice.Clear(Color.Black);
 
             Rectangle destinationRectangle = this.CalculateDestinationRectangle();
-            
-
-            
 
             game.tileRenderer.Begin(Matrix.Identity, textureFiltering);
             game.tileRenderer.SpriteBatch.Draw(target, destinationRectangle, null, Color.White); //draw tiles
             game.tileRenderer.End();
 
-            
-
             game.guiRenderer.Begin(Matrix.Identity, textureFiltering);
             game.guiRenderer.SpriteBatch.Draw(target2, destinationRectangle, null, Color.White); //draw gui
             game.guiRenderer.End();
-
-
 
         }
         

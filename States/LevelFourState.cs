@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SpeezleGame.Entities;
 using SpeezleGame.Renderers;
 using SpeezleGame.UserData;
 using System;
@@ -8,18 +9,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SpeezleGame.Entities;
 
 namespace SpeezleGame.States
 {
-    public class LevelThreeState : GameLevelState
+    public class LevelFourState : GameLevelState
     {
-        public LevelThreeState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
+        public LevelFourState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
         {
-            tilemapPathName = "\\levelthreetilemap.tmx";
+            tilemapPathName = "\\levelfourtilemap.tmx";
             backgroundTexturePathName = "\\LevelBackground5";
-            currentLevel = "Three";
-
+            currentLevel = "Four";
         }
 
         public override void Initialize()
@@ -78,19 +77,21 @@ namespace SpeezleGame.States
             };
 
             Rectangle smartEnemy1Rect = new Rectangle();
-            foreach(var entityAreaObj in entityAreas)
+            foreach (var entityAreaObj in entityAreas)
             {
-                if(entityAreaObj.objectId == 78)
+                if (entityAreaObj.objectId == 75)
                 {
                     smartEnemy1Rect = entityAreaObj.Bounds;
                 }
             }
 
-            SmartEnemy smartEnemy1 = new SmartEnemy(enemyContainer1, 0.1f, nodeMap, smartEnemy1Rect, new Vector2(464, 400));
+            SmartEnemy smartEnemy1 = new SmartEnemy(enemyContainer1, 0.1f, nodeMap, smartEnemy1Rect, new Vector2(260, 610));
 
             _entities.Add(smartEnemy1);
             _entitiesWoPlayer.Add(smartEnemy1);
 
         }
+
+
     }
 }

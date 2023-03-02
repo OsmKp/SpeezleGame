@@ -25,8 +25,6 @@ namespace SpeezleGame.Core
         private int mapWidth;
         private int mapHeight;
 
-
-
         public Camera(Player targetPlayer, Viewport vp, int camW, int camH)
         {
             camPos = Vector2.Zero;
@@ -64,8 +62,6 @@ namespace SpeezleGame.Core
 
         }
 
-
-
         private Vector2 GetTarget() //Gets the player position
         {
             var playerRectangle = playerToFollow.playerBounds;
@@ -89,7 +85,6 @@ namespace SpeezleGame.Core
             Smoothing(target);
 
             SetMatrix();
-
             
         }
 

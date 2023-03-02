@@ -3,7 +3,7 @@
     public enum AnimationState
     {
         Stopped,
-        Pause,
+        Paused,
         Playing
     }
 }

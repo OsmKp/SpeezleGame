@@ -47,13 +47,15 @@ namespace SpeezleGame.States
         protected TiledLayer endLayer;
         protected TiledLayer nodeLayer;
         protected TiledLayer spawnLayer;
+        protected TiledLayer pathfindingLayer;
+
         protected Vector2 PlayerStartCoord;
 
         protected List<Rectangle> RectangleMapObjects;
         protected List<MapObject> MapObjects;
 
         protected List<Node> NodeList;
-
+        protected List<EntityAreaObject> entityAreas;
 
         protected List<TiledPolygon> PolygonCollisionObjects;
 
@@ -333,30 +335,7 @@ namespace SpeezleGame.States
             };
 
 
-            List<Vector2> waypoints1 = new List<Vector2>();
-            waypoints1.Add(new Vector2(1340, 750));
-            waypoints1.Add(new Vector2(1500, 750));
-
-            List<Vector2> waypoints2 = new List<Vector2>();
-            waypoints2.Add(new Vector2(1600, 750));
-            waypoints2.Add(new Vector2(1800, 750));
-
-            List<Vector2> waypoints3 = new List<Vector2>();
-            waypoints3.Add(new Vector2(1050, 750));
-            waypoints3.Add(new Vector2(1250, 750));
-
-            List<JumpTrigger> jumpObjects = new List<JumpTrigger>();
-
-            PatrollingEnemy enemy1 = new PatrollingEnemy(enemyContainer1, 0.1f, waypoints1, jumpObjects);
-            PatrollingEnemy enemy2 = new PatrollingEnemy(enemyContainer1, 0.1f, waypoints2, jumpObjects);
-            PatrollingEnemy enemy3 = new PatrollingEnemy(enemyContainer1, 0.1f, waypoints3, jumpObjects);
-
-            _entities.Add(enemy1);
-            _entities.Add(enemy2);
-            _entities.Add(enemy3);
-            _entitiesWoPlayer.Add(enemy1);
-            _entitiesWoPlayer.Add(enemy2);
-            _entitiesWoPlayer.Add(enemy3);
+            
         }
         private void HandleLevelTimeInitialization()
         {
@@ -381,6 +360,12 @@ namespace SpeezleGame.States
                     dashTexture = contentManager.Load<Texture2D>("Textures/CactusWalkingAnimation2");
                     slideTexture = contentManager.Load<Texture2D>("Textures/CactusWalkingAnimation2");
                     break;
+                case "Flower":
+                    idleTexture = contentManager.Load<Texture2D>("Textures/FlowerIdleAnimation");
+                    walkTexture = contentManager.Load<Texture2D>("Textures/FlowerWalkingAnimation");
+                    dashTexture = contentManager.Load<Texture2D>("Textures/FlowerWalkingAnimation");
+                    slideTexture = contentManager.Load<Texture2D>("Textures/FlowerWalkingAnimation");
+                    break;
             }
 
 
@@ -389,7 +374,8 @@ namespace SpeezleGame.States
                 Idle = idleTexture,
                 Walk = walkTexture,
                 Dash = dashTexture,
-                Slide = slideTexture
+                Slide = slideTexture,
+                
             };
 
 
@@ -416,13 +402,14 @@ namespace SpeezleGame.States
             endLayer = map.Layers.First(l => l.name == "End");
             nodeLayer = map.Layers.First(l => l.name == "Node");
             spawnLayer = map.Layers.First(l => l.name == "Spawn");
+            pathfindingLayer = map.Layers.First(l => l.name == "Pathfinding");
 
             _tileMapHandler = new TileMapHandler(_graphicsDevice, map, tilesets, tilesetTexture);
 
             RectangleMapObjects = new List<Rectangle>();
             MapObjects = new List<MapObject>();
             NodeList = new List<Node>();
-
+            entityAreas = new List<EntityAreaObject>();
 
 
             PolygonCollisionObjects = new List<TiledPolygon>();
@@ -471,6 +458,13 @@ namespace SpeezleGame.States
             foreach (var obj in nodeLayer.objects)
             {
                 //NodeList.Add
+                NodeList.Add(new Node(new Vector2(obj.x, obj.y), obj.name, obj.id));
+                
+            }
+            nodeMap = new NodeMap(NodeList);
+            foreach (var obj in pathfindingLayer.objects)
+            {
+                entityAreas.Add(new EntityAreaObject(obj.id, new Rectangle((int)obj.x, (int)obj.y, (int)obj.width, (int)obj.height)));
             }
 
 

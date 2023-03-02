@@ -256,6 +256,8 @@ namespace SpeezleGame.States
                 verticalStretch = 4,
             };
 
+            LevelFour.Click += LevelFour_Click;
+
             Label LevelFourStars = new Label(threeStarTexture, generalFont)
             {
                 Position = new Vector2(370, 116),
@@ -284,6 +286,8 @@ namespace SpeezleGame.States
                 horizontalStretch = 4,
                 verticalStretch = 4,
             };
+
+            LevelFive.Click += LevelFive_Click;
 
             Label LevelFiveStars = new Label(threeStarTexture, generalFont)
             {
@@ -361,6 +365,22 @@ namespace SpeezleGame.States
                 GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
             }
 
+        }
+
+        private void LevelFour_Click(object sender, EventArgs e)
+        {
+            if (saveLoadManager.currentUser.IsLevelUnlocked("Four"))
+            {
+                GameStateManager.Instance.ChangeScreen(new LevelFourState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            }
+        }
+
+        private void LevelFive_Click(object sender, EventArgs e)
+        {
+            if (saveLoadManager.currentUser.IsLevelUnlocked("Five"))
+            {
+                GameStateManager.Instance.ChangeScreen(new LevelFiveState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+            }
         }
 
         private void Menu_Click(object sender, EventArgs e)

@@ -5,11 +5,11 @@ using SpeezleGame.Core;
 namespace SpeezleGame.Graphics
 {
     public class RenderingState
-    {
+    {   
         public string Name { get; }
-        public IAnimation Animation { get; }
+        public SpriteAnimation Animation { get; }
 
-        public RenderingState(string name, IAnimation animation)
+        public RenderingState(string name, SpriteAnimation animation)
         {
             Name = name;
             Animation = animation;

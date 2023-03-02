@@ -9,7 +9,7 @@ using SpeezleGame.Core;
 
 namespace SpeezleGame.Graphics
 {
-    public class SpriteAnimation : IAnimation
+    public class SpriteAnimation
     {
         public const double DEFAULT_FPS = 8;
 
@@ -71,7 +71,7 @@ namespace SpeezleGame.Graphics
         }
         public void Pause()
         {
-            State = AnimationState.Pause;
+            State = AnimationState.Paused;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace SpeezleGame.Graphics
             CurrentState = GetState(name);
 
         }
-        public RenderingState AddState(string name, IAnimation animation)
+        public RenderingState AddState(string name, SpriteAnimation animation)
         {
             var state = new RenderingState(name, animation);
             _states.Add(name, state);

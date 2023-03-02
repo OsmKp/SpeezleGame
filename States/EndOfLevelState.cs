@@ -67,8 +67,8 @@ namespace SpeezleGame.States
                 { "one", new [] {30,50,70} },
                 {"Two", new [] { 15, 30, 45} },
                 {"Three", new[]{20,30,40} },
-                {"Four", new[]{20,30,40} },
-                {"Five",new[] {20,30,40} },
+                {"Four", new[]{25,40,55} },
+                {"Five",new[] {35,55,75} },
             };
 
         }
@@ -396,6 +396,12 @@ namespace SpeezleGame.States
                 case "Three":
                     GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
+                case "Four":
+                    GameStateManager.Instance.ChangeScreen(new LevelFourState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Five":
+                    GameStateManager.Instance.ChangeScreen(new LevelFiveState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
             }
             
         }
@@ -411,7 +417,10 @@ namespace SpeezleGame.States
                     GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
                 case "Three":
-                    GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    GameStateManager.Instance.ChangeScreen(new LevelFourState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Four":
+                    GameStateManager.Instance.ChangeScreen(new LevelFiveState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
             }
         }

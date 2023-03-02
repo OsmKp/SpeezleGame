@@ -282,6 +282,15 @@ namespace SpeezleGame.States
 
             Slot3.Click += Save3_Click;
 
+            Label Message = new Label(invisibleTexture, generalFont)
+            {
+                Position = new Vector2(290, 10),
+                Text = "Welcome, Please Select A Slot!",
+                Layer = 0.2f,
+                horizontalStretch = 3,
+                verticalStretch = 2,
+            };
+
             _components = new List<Component>()
             {
                 Slot1Back,
@@ -302,7 +311,7 @@ namespace SpeezleGame.States
                 Slot1,
                 Slot2,
                 Slot3,
-
+                Message,
             };
 
         }

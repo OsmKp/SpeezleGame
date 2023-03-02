@@ -162,7 +162,13 @@ namespace SpeezleGame.States
                     GameStateManager.Instance.ChangeScreen(new LevelTwoState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
                 case "Three":
-
+                    GameStateManager.Instance.ChangeScreen(new LevelThreeState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Four":
+                    GameStateManager.Instance.ChangeScreen(new LevelFourState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
+                    break;
+                case "Five":
+                    GameStateManager.Instance.ChangeScreen(new LevelFiveState(_graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager));
                     break;
             }
 

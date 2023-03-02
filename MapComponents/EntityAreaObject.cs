@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace SpeezleGame.MapComponents
 {
-    public class JumpTrigger : MapObject
+    public class EntityAreaObject : MapObject
     {
-        public JumpTrigger(int objectId, Rectangle bounds) : base(objectId, bounds)
+        public EntityAreaObject(int objectId, Rectangle bounds) : base(objectId, bounds)
         {
-
         }
+
+        
     }
 }

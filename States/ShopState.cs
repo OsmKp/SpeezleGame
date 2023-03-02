@@ -35,9 +35,12 @@ namespace SpeezleGame.States
         private int coinAmount;
 
         private int cactusPrice = 10;
+        private int flowerPrice = 100;
 
         bool isCactusBought;
+        bool isFlowerBought;
         string button1Text = "Buy Cactus";
+        string button2Text = "Buy Flower";
         public ShopState(GraphicsDevice graphicsDevice, GUIRenderer guiRenderer, EntityRenderer entityRenderer, TileRenderer tileRenderer, BackgroundRenderer backgroundRenderer, Core.SpeezleGame game, SaveLoadManager saveLoadManager) : base(graphicsDevice, guiRenderer, entityRenderer, tileRenderer, backgroundRenderer, game, saveLoadManager)
         {
         }
@@ -92,6 +95,10 @@ namespace SpeezleGame.States
             if (isCactusBought) { button1Text = "Cactus Already Owned"; }
             BuyButton1.Text = button1Text;
 
+            isFlowerBought = saveLoadManager.currentUser.IsSkinOwned("Flower");
+            if (isFlowerBought) { button2Text = "Flower Already Owned"; }
+            BuyButton2.Text = button2Text;
+
 
         }
         private void HandleUIInitialization(ContentManager contentManager)
@@ -99,11 +106,14 @@ namespace SpeezleGame.States
             isCactusBought = saveLoadManager.currentUser.IsSkinOwned("Cactus"); 
             if (isCactusBought) { button1Text = "Cactus Already Owned"; }
 
+            isFlowerBought = saveLoadManager.currentUser.IsSkinOwned("Flower");
+            if (isFlowerBought) { button2Text = "Flower Already Owned"; }
+
             font = contentManager.Load<SpriteFont>("Test/generalFont");
             displayButtonTexture = contentManager.Load<Texture2D>("Test/CoinDisplay");
             buyButtonTexture = contentManager.Load<Texture2D>("Test/DisplayGuiTexture");
             skin1Texture = contentManager.Load<Texture2D>("Test/TestSkinFrame");
-            skin2Texture = contentManager.Load<Texture2D>("Test/TestSkinFrame2");
+            skin2Texture = contentManager.Load<Texture2D>("Test/FlowerSkinFrame");
             backButtonTexture = contentManager.Load<Texture2D>("Test/GreyButton");
             coinAmount = saveLoadManager.currentUser.GetCurrency();
 
@@ -147,7 +157,7 @@ namespace SpeezleGame.States
             BuyButton2 = new Button(buyButtonTexture, font)
             {
                 Position = new Vector2(396, 260),
-                Text = "Buy",
+                Text = button2Text,
                 Layer = 0.5f,
             };
 
@@ -156,7 +166,7 @@ namespace SpeezleGame.States
             Label PriceLabel2 = new Label(displayButtonTexture, font)
             {
                 Position = new Vector2(400, 50),
-                Text = "10",
+                Text = flowerPrice.ToString(),
                 Layer = 0.2f,
             };
 
@@ -212,6 +222,12 @@ namespace SpeezleGame.States
         private void BuyButton2_Click(object sender, EventArgs e)
         {
 
+            if (isFlowerBought == false && saveLoadManager.currentUser.GetCurrency() >= flowerPrice)
+            {
+                saveLoadManager.currentUser.AddCurrency(-flowerPrice);
+                saveLoadManager.currentUser.AddNewSkin("Flower");
+                UpdateText();
+            }
         }
     }
 }

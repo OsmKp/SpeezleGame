@@ -1,28 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using SpeezleGame.AI;
+using SpeezleGame.Entities.Players;
 using SpeezleGame.Graphics;
+using SpeezleGame.MapComponents;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using TiledCS;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
-using System.Diagnostics;
-using SpeezleGame.Physics;
-using Microsoft.Xna.Framework.Content;
-using SpeezleGame.Core;
-using Microsoft.Xna.Framework.Audio;
-using SpeezleGame.States;
-using SpeezleGame.Entities.Players;
-using SpeezleGame.MapComponents;
-using SpeezleGame.AI;
 
 namespace SpeezleGame.Entities
 {
-    public class PatrollingEnemy : BaseEntity
+    public class SmartEnemy : BaseEntity
     {
         private readonly RenderingStateMachine _renderingStateMachine = new RenderingStateMachine();
         private bool chasingPlayer;
@@ -31,8 +23,6 @@ namespace SpeezleGame.Entities
         private List<Vector2> waypoints;
         
         private int currentWaypointIndex = 0;
-
-
 
         private float previousBottom;
         public Rectangle enemyBounds
@@ -43,7 +33,6 @@ namespace SpeezleGame.Entities
                 return new Rectangle((int)Position.X + 2, (int)Position.Y, 14, 33);
             }
         }
-
         public bool IsAlive { get { return isAlive; } }
         bool isAlive = true;
 
@@ -73,18 +62,9 @@ namespace SpeezleGame.Entities
         }
         Vector2 velocity;
 
-
-
-
-
-
-
-        
+        private string targetName = "player";
         private Vector2 targetLocation;
-        private int targetIndex;
-        
         private float movement;
-        
 
         //horizontal movement constants
         private const float MoveAcceleration = 4000.0f;
@@ -96,22 +76,21 @@ namespace SpeezleGame.Entities
         private const float MaxFallSpeed = 300.0f;
         private float lastMovement;
 
-
         private bool isJumping;
         private bool wasJumping;
         private int jumpCounter;
         private float jumpTime;
 
-
         private const float MaxJumpTime = 0.35f;
         private const float JumpLaunchVelocity = -2400.0f;
-        private const float JumpControlPower = 0.14f;
-        public PatrollingEnemy(EnemyTextureContainer enemyTextureContainer, float groundDragFactor, List<Vector2> _waypoints)
-        {
-            this.Health = 150;
-            GroundDragFactor = groundDragFactor;
+        private const float JumpControlPower = 0.4f;
 
-            
+        PathfindingAI AI;
+
+        public SmartEnemy(EnemyTextureContainer enemyTextureContainer, float groundDragFactor, NodeMap nodeMap, Rectangle enemyArea, Vector2 spawnPos)
+        {
+            GroundDragFactor = groundDragFactor;
+            this.Health = 150;
 
             _renderingStateMachine.AddState(nameof(EnemyTextureContainer.Idle),
                 new SpriteAnimation(enemyTextureContainer.Idle, 1, 16, 32));
@@ -120,18 +99,12 @@ namespace SpeezleGame.Entities
             _renderingStateMachine.SetState(nameof(EnemyTextureContainer.Idle)); //set the initial state to idle
             _renderingStateMachine.CurrentState.Animation.Play();
 
-            this.waypoints = _waypoints;
+            Position = spawnPos;
 
-            this.Position = new Vector2(waypoints[0].X, waypoints[0].Y);
-            targetLocation = new Vector2(waypoints[1].X, waypoints[1].Y);
-            targetIndex = 1;
+            AI = new PathfindingAI(enemyArea, nodeMap);
+
         }
 
-
-
-
-
-       
         public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             SpriteEffects flip = SpriteEffects.None;
@@ -147,51 +120,17 @@ namespace SpeezleGame.Entities
 
             _renderingStateMachine.Draw(spriteBatch, Position, flip);
         }
-
         public override void Update(GameTime gameTime)
         {
-
+            
         }
-
-        private void CalculateMovement()
+        public override void Update(GameTime gameTime, Vector2 playerPos, List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, Player player)
         {
-            float distToTarget = Vector2.Distance(Position, targetLocation);
-            if(distToTarget < 16)
-            {
-                targetIndex = GetIndexOfNextWaypoint();
-                targetLocation = waypoints[targetIndex];
-                Debug.WriteLine("GETTING NEW WPWPW");
-            }
-            if(Position.X - targetLocation.X < 0)
-            {
-                Debug.WriteLine("SHOULD GO RIGHT RN");
-                movement = 1f;
-            }
-            else
-            {
-                Debug.WriteLine("SHOULD GO LEFT RN");
-                movement = -1f;
-            }
-        }
+            Stack<Node> path = AI.DoCalculations(Position, playerPos, player.playerBounds);
 
-        private int GetIndexOfNextWaypoint()
-        {
-            int size = waypoints.Count;
-            if(targetIndex == size - 1)
-            {
-                return 0;
-            }
-            else
-            {
-                return targetIndex + 1;
-            }
-        }
+            CalculateMovement(path, playerPos, player.playerBounds);
 
-        public override void Update(GameTime gameTime, Vector2 playerPos ,List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, Player player)
-        {
-            CalculateMovement();
-
-            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects,mapObjects, player);
+            ApplyPhysics(gameTime, RectangleMapObjects, PolygonCollisionObjects, mapObjects, player);
 
             if (IsAlive)
             {
@@ -200,21 +139,79 @@ namespace SpeezleGame.Entities
                     _renderingStateMachine.SetState(nameof(PlayerTextureContainer.Walk));
                     _renderingStateMachine.CurrentState.Animation.Play();
                 }
-                else if(Velocity.Y != 0 && isJumping)
-                {
-                    _renderingStateMachine.SetState(nameof(PlayerTextureContainer.Jump));
-                    _renderingStateMachine.CurrentState.Animation.Play();
-                }
-                else if (Velocity.X == 0 )
+                else if (Velocity.X == 0)
                 {
                     _renderingStateMachine.SetState(nameof(PlayerTextureContainer.Idle));
                     _renderingStateMachine.CurrentState.Animation.Play();
                 }
 
-
             }
 
             _renderingStateMachine.Update(gameTime);
+        }
+        private void CalculateMovement(Stack<Node> path, Vector2 playerPos, Rectangle playerBounds)
+        {
+            if (path.Count == 0) 
+            { 
+                if(Math.Abs(playerPos.X - Position.X) > 8 && playerBounds.Intersects(AI.EntityArea))
+                {
+                    movement = CalculateMovementDir(playerPos);
+                }
+                else
+                {
+                    movement = 0f;
+                    isJumping = false;
+                }
+                return; 
+            }
+
+            Node nextNode = path.Peek();
+            
+            bool closeEnoughToJump = CloseEnoughToJump(nextNode.Position);
+            bool nodeIsAbove = IsNodeAbove(nextNode.Position);
+            movement = CalculateMovementDir(nextNode.Position);
+
+            if(nodeIsAbove && closeEnoughToJump)
+            {
+                
+                isJumping = true;
+            }
+
+        }
+
+        private bool IsNodeAbove(Vector2 nodePos)
+        {
+            float heightDiff = Position.Y - nodePos.Y;
+            if(heightDiff > 16)
+            {
+
+                return true;
+            }
+            else{
+                
+                return false;
+            }
+        }
+        private bool CloseEnoughToJump(Vector2 nodePos)
+        {
+            float xDiff = Math.Abs(nodePos.X - Position.X);
+            if (xDiff < 32)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private float CalculateMovementDir(Vector2 nodePos)
+        {
+            if(nodePos.X - Position.X >= 0)
+            {
+                
+                return 1f;
+            }
+            else {  return -1f; }
         }
         private float DoJump(float velocityY, GameTime gameTime)
         {
@@ -238,14 +235,12 @@ namespace SpeezleGame.Entities
             }
             else
             {
-
                 jumpTime = 0.0f;
 
             }
 
-            
             wasJumping = isJumping;
-            
+
             return velocityY;
         }
 
@@ -254,7 +249,7 @@ namespace SpeezleGame.Entities
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             previousPosition = Position;
             //damage cooldown
-            if(DamageCooldownCounter >= DamageCooldown)
+            if (DamageCooldownCounter >= DamageCooldown)
             {
                 DamageCooldownCounter = 0f;
                 isDamageLocked = false;
@@ -265,13 +260,12 @@ namespace SpeezleGame.Entities
             }
             //--------------
 
-            
             velocity.X += movement * MoveAcceleration * elapsed;
             velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
 
             velocity.Y = DoJump(velocity.Y, gameTime);
 
-            
+
             if (IsOnGround) //if the enemy is on the ground apply resistive forces
             { velocity.X *= GroundDragFactor; }
             else
@@ -282,7 +276,7 @@ namespace SpeezleGame.Entities
             Position += velocity * elapsed; //change the position by using the velocity
             Position = new Vector2((float)Math.Round(Position.X), (float)Math.Round(Position.Y));
 
-            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(),mapObjects, elapsed,  player);
+            HandleCollisions(RectangleMapObjects, new List<TiledPolygon>(), mapObjects, elapsed, player);
 
             if (Position.X == previousPosition.X)
             { velocity.X = 0; }
@@ -292,11 +286,10 @@ namespace SpeezleGame.Entities
 
 
         }
-        private void HandleCollisions( List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, float elapsed, Player player)
+        private void HandleCollisions(List<Rectangle> RectangleMapObjects, List<TiledPolygon> PolygonCollisionObjects, List<MapObject> mapObjects, float elapsed, Player player)
         {
-            HandleRectangleRectangleCollisions(RectangleMapObjects,mapObjects, player); //handle collisions with rectangle objects
+            HandleRectangleRectangleCollisions(RectangleMapObjects, mapObjects, player); //handle collisions with rectangle objects
         }
-
         private void HandleRectangleRectangleCollisions(List<Rectangle> RectangleMapObjects, List<MapObject> mapObjects, Player player)
         {
             Rectangle bounds = enemyBounds;
@@ -324,39 +317,31 @@ namespace SpeezleGame.Entities
                         {
 
                             if (previousBottom <= collisionObject.Top)
-                                
 
+                                if (IsOnGround)
+                                {
+                                    // Resolve the collision along the Y axis.
+                                    Position = new Vector2(Position.X, Position.Y + depth.Y);
 
+                                    bounds = enemyBounds;
+                                }
+                                else
+                                {
+                                    Position = new Vector2(Position.X, Position.Y + depth.Y);
 
-                            if (IsOnGround)
-                            {
-                                // Resolve the collision along the Y axis.
-                                Position = new Vector2(Position.X, Position.Y + depth.Y);
-
-                                bounds = enemyBounds;
-                            }
-                            else
-                            {
-                                Position = new Vector2(Position.X, Position.Y + depth.Y);
-                                        
-                            }
-
+                                }
                         }
                         else
                         {
                             Position = new Vector2(Position.X + depth.X, Position.Y);
-                            isJumping = true;
+                            
                             // Perform further collisions with the new bounds.
                             bounds = enemyBounds;
                         }
                     }
                 }
-                    
+
             }
-            
-
-
-
 
         }
     }
